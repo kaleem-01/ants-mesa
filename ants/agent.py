@@ -103,6 +103,12 @@ class Food(Agent):
         Add the amount to the food amount
         """
         self.amount += amount
+    
+    def decay(self):
+        decay_rate = self.model.decay_rate
+        self.amount -= self.amount * decay_rate
+        if self.amount < 1:
+            self.amount = 0
 
     def eaten(self):
         """
@@ -115,7 +121,13 @@ class Food(Agent):
         """
         Returns a bool to show if there is food available
         """
-        return self.amount > 0
+        return self.amount > 1
+    
+    def step(self):
+        """
+        Each step, decay the food amount based on the decay rate.
+        """
+        self.decay()
 
 class Ant(Agent):
     """

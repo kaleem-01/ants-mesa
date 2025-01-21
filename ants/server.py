@@ -43,7 +43,7 @@ def diffusion_portrayal(agent):
         portrayal["Filled"] = "true"
         portrayal["Layer"] = 2
         portrayal["Color"] = "#00FF00BB"
-        portrayal["text"] = agent.amount
+        portrayal["text"] = round(agent.amount)
         portrayal["text_color"] = "black"
     elif type(agent) is Home:
         portrayal["Shape"] = "circle"
@@ -77,11 +77,12 @@ canvas_element = CanvasGrid(diffusion_portrayal, 50, 50, 500, 500)
 model_params = {
     "height": 50,
     "width": 50,
-    "evaporate": Slider("Evaporation Rate", 0.50, 0.01, 0.50, 0.01),
-    "diffusion": Slider("Diffusion Rate", 1.0, 0.0, 1.0, 0.1),
+    "evaporate": Slider("Pheromone Evaporation Rate", 0.50, 0.01, 0.50, 0.01),
+    "diffusion": Slider("Pheromone Diffusion Rate", 1.0, 0.0, 1.0, 0.1),
     "initdrop": Slider("Initial Drop", 100, 100, 1000, 50),
     "prob_random": Slider("Random Move Probability", 0.1, 0.0, 1.0, 0.1),
     "drop_rate": Slider("Drop Decay Rate", 0.9, 0, 1, 0.01),
+    "decay_rate": Slider("Food Decay Rate", 0.01, 0.0, 0.1, 0.001),
 }
 
 server = ModularServer(

@@ -10,7 +10,7 @@ class AntWorld(Model):
     Represents the ants foraging for food.
     """
 
-    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9):
+    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9, decay_rate=0.01):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -22,6 +22,7 @@ class AntWorld(Model):
         self.lowerbound = lowerbound
         self.prob_random = prob_random
         self.drop_rate = drop_rate
+        self.decay_rate = decay_rate
 
         # Set up the grid and schedule.
 
@@ -71,5 +72,9 @@ class AntWorld(Model):
         self.schedule.step()
 
         # stop when all the food is collected
-        if self.home.amount == 300:
+        # if self.home.amount == 300:
+        #     self.running = False
+
+        # stop when no food remains to collect
+        if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
             self.running = False
