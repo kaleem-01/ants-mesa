@@ -10,7 +10,7 @@ class AntWorld(Model):
     Represents the ants foraging for food.
     """
 
-    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9, decay_rate=0.01, consumption_rate=0.1, carrying_capacity=1):
+    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9, decay_rate=0.01, consumption_rate=0.1, carrying_capacity=1,max_steps_without_food=100, birth_rate=0.1):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -23,8 +23,6 @@ class AntWorld(Model):
         self.prob_random = prob_random
         self.drop_rate = drop_rate
         self.decay_rate = decay_rate
-        self.consumption_rate = consumption_rate
-        self.carrying_capacity = carrying_capacity
 
         # Set up the grid and schedule.
 
@@ -109,4 +107,12 @@ class AntWorld(Model):
 
         # Record in datacollector
         self.datacollector.collect(self)
+
+        #birth of new ants
+
+        num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
+        for i in range(int(self.birth_rate * num_ants)):
+            ant = Ant(self.next_id(), self.home, self)
+            self.grid.place_agent(ant, self.home.pos)
+            self.schedule.add(ant)
 
