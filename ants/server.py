@@ -85,7 +85,7 @@ model_params = {
     "drop_rate": Slider("Drop Decay Rate", 0.9, 0, 1, 0.01),
     "decay_rate": Slider("Food Decay Rate", 0.01, 0.0, 0.1, 0.001),
     "max_steps_without_food": Slider("Max steps without food", 50, 0, 500, 10),
-    "birth_rate": Slider("Birth rate", 0.001, 0.0, 1.0, 0.01),
+    "birth_rate": Slider("Birth rate", 0.001, 0.0, 0.1, 0.001),
 }
 
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},])

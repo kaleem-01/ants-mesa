@@ -174,6 +174,7 @@ class Ant(Agent):
             food = self.get_item(Food)
 
             if food is not None and food.any_food(): # Eat the food and then head home
+                self.steps_without_food = 0
                 food.eaten()
                 self.state = "HOMING"
                 self.drop = self.model.initdrop
