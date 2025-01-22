@@ -43,6 +43,7 @@ class AntWorld(Model):
 
         # Define pos for the initial home and food locations
         homeloc = (25, 25)
+        predator_loc = (30, 30)
         food_locs = ((22, 11), (35, 8), (18, 33))
 
         # Setup the datacollector
@@ -52,6 +53,10 @@ class AntWorld(Model):
         self.home = Home(self.next_id(), homeloc, self)
         self.grid.place_agent(self.home, homeloc)
         self.schedule.add(self.home)
+
+        predator = Predator(self.next_id(), self)
+        self.grid.place_agent(predator, predator_loc)
+        self.schedule.add(predator)
 
         # Add in the ants
         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation

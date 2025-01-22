@@ -4,7 +4,7 @@ from mesa.visualization import Slider
 from mesa.visualization import ChartModule
 
 from .model import AntWorld
-from .agent import Environment, Ant, Food, Home
+from .agent import Environment, Ant, Food, Home, Predator
 import math
 
 
@@ -67,6 +67,13 @@ def diffusion_portrayal(agent):
         # Scale this between red and white
         # cite https://stackoverflow.com/questions/3380726/converting-a-rgb-color-tuple-to-a-six-digit-code-in-python
         portrayal["Color"] = '#FF%02x%02x' % (255 - red, 255 - red)
+    
+    elif type(agent) is Predator:
+        portrayal["Shape"] = "circle"
+        portrayal["r"] = 2
+        portrayal["Filled"] = "true"
+        portrayal["Layer"] = 4
+        portrayal["Color"] = "red"
 
     return portrayal
 

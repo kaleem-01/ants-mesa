@@ -1,5 +1,6 @@
 from mesa import Agent
 import math
+import random
 
 # from Sugarscape_cg
 def get_distance(pos_1, pos_2):
@@ -178,6 +179,7 @@ class Ant(Agent):
             self.model.grid.remove_agent(self)
             return
         
+        print(self.pos)
         if self.state == "FORAGING":
             # Look for Food
             food = self.get_item(Food)
@@ -265,3 +267,56 @@ class Ant(Agent):
             self.model.grid.move_agent(self, where)
         else:
             self.random_move()
+
+class Predator(Agent):
+    def __init__(self, unique_id, model, moore=True):
+        """
+        Initialize the predator with its unique ID and behavior.
+        """
+        super().__init__(unique_id, model)
+        self.pos = (30, 30)
+        self.moore = moore  # Determines movement style (Moore or Von Neumann neighborhood)
+
+    def hunt(self):
+        """
+        The predator will hunt for ants in its neighborhood.
+        """
+        neighbors = self.model.grid.get_neighbors(self.pos, self.moore, include_center=False)
+        ants = [n for n in neighbors if isinstance(n, Ant)]
+
+        if ants:
+            print(ants)
+            # If there are ants nearby, choose one randomly and move there
+            target_ant = self.random.choice(ants)
+            if target_ant is None:
+                random.move()
+            else:
+                self.model.grid.move_agent(self, target_ant.pos)
+                self.catch(target_ant)
+        else:
+            # Otherwise, move randomly
+            self.random_move()
+
+    def catch(self, ant):
+        """
+        Catch and 'eat' the given ant, removing it from the model.
+        """
+        self.model.grid.remove_agent(ant)
+        self.model.schedule.remove(ant)  # Also remove it from the schedule
+    
+    def random_move(self):
+        """
+        Step one cell in any allowable direction.
+        """
+        # Pick the next cell from the adjacent cells.
+        next_moves = self.model.grid.get_neighborhood(self.pos, self.moore, True)
+        next_move = self.random.choice(next_moves)
+        # Now move:
+        self.model.grid.move_agent(self, next_move)
+
+    def step(self):
+        """
+        Execute one step of the predator's behavior.
+        """
+        print(self.pos)
+        self.hunt()
