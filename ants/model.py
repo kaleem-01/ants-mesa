@@ -2,7 +2,7 @@ from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import MultiGrid
 
-from .agent import Environment, Ant, Food, Home
+from .agent import Environment, Ant, Food, Home, Predator
 
 # derived from ConwaysGameOfLife
 class AntWorld(Model):
@@ -10,7 +10,7 @@ class AntWorld(Model):
     Represents the ants foraging for food.
     """
 
-    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9, decay_rate=0.01):
+    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=0, lowerbound=0.01, prob_random=0.1, drop_rate=0.1, decay_rate=0.01):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -37,11 +37,16 @@ class AntWorld(Model):
 
         # Define pos for the initial home and food locations
         homeloc = (25, 25)
+        predator_loc = (30, 30)
         food_locs = ((22, 11), (35, 8), (18, 33))
 
         self.home = Home(self.next_id(), homeloc, self)
         self.grid.place_agent(self.home, homeloc)
         self.schedule.add(self.home)
+
+        predator = Predator(self.next_id(), self)
+        self.grid.place_agent(predator, predator_loc)
+        self.schedule.add(predator)
 
         # Add in the ants
         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
