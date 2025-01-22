@@ -143,7 +143,7 @@ class Ant(Agent):
         self.home = home
         self.moore = moore
         self.steps_without_food = 0
-        self.carrying = 10
+        self.carrying = 0
 
     # derived from Sugarscape get_sugar()
     def get_item(self, item):
@@ -156,11 +156,11 @@ class Ant(Agent):
                 print(agent)
                 return agent
     
-    def consume_food(self):
-        """
-        Consume food from the available food
-        """
-        self.carrying -= self.model.consumption_rate
+    # def consume_food(self):
+    #     """
+    #     Consume food from the available food
+    #     """
+    #     self.carrying -= self.model.consumption_rate
 
 
     def step(self):
@@ -201,14 +201,16 @@ class Ant(Agent):
             # If Home, then go back to FORAGING
             if self.pos == self.home.pos:
                 home = self.get_item(Home)
-                home.add(1)
+                if self.carrying > 0:
+                    home.add(self.carrying)
+                    self.carrying = 0
                 self.state = "FORAGING"
                 self.drop = 0
             else: #drop pheromone, and move toward home
                 self.drop_pheromone()
                 self.home_move()
             
-        self.consume_food()
+        # self.consume_food()
 
     def drop_pheromone(self):
         """

@@ -12,7 +12,7 @@ class AntWorld(Model):
 
     def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, 
                  drop_rate=0.9, decay_rate=0.01,max_steps_without_food=100, birth_rate=0.1, consumption_rate=0.001,
-                 carrying_capacity=0.001):
+                 carrying_capacity=1):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -85,11 +85,15 @@ class AntWorld(Model):
         
         def get_home(model):
             return model.home.amount
+            
+        def get_carrying(model):
+            return sum(ant.carrying for ant in model.schedule.agents if isinstance(ant, Ant))
         
         model_reporters = {
             'Ants 🐜': lambda mod: get_ants(mod),
             'Food 🍯': lambda mod: get_food(mod),
-            'Home 🏠': lambda mod: get_home(mod)
+            'Home 🏠': lambda mod: get_home(mod),
+            'Carrying': lambda mod: get_carrying(mod)
         }
 
         self.datacollector = DataCollector(

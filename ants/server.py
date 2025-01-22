@@ -91,7 +91,8 @@ model_params = {
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},])
 
 food_num_plot = ChartModule([{"Label": "Food 🍯", "Color": "blue"},
-                             {"Label": "Home 🏠", "Color": "red"}])
+                             {"Label": "Home 🏠", "Color": "red"},
+                             {"Label": "Carrying", "Color": "purple"}])
 
 server = ModularServer(
     model_cls = AntWorld, 
@@ -100,4 +101,4 @@ server = ModularServer(
     model_params=model_params
 )
 
-server.port=8020
+server.port = 8521
