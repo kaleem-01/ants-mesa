@@ -1,7 +1,7 @@
 from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import MultiGrid
-
+from mesa.datacollection import DataCollector
 from .agent import Environment, Ant, Food, Home
 
 # derived from ConwaysGameOfLife
@@ -39,6 +39,10 @@ class AntWorld(Model):
         homeloc = (25, 25)
         food_locs = ((22, 11), (35, 8), (18, 33))
 
+        # Setup the datacollector
+        self.setup_datacollector() 
+
+
         self.home = Home(self.next_id(), homeloc, self)
         self.grid.place_agent(self.home, homeloc)
         self.schedule.add(self.home)
@@ -65,6 +69,28 @@ class AntWorld(Model):
 
         self.running = True
 
+    def setup_datacollector(self):
+
+        def get_ants(model):
+            return sum(1 for agent in model.schedule.agents if isinstance(agent, Ant))
+        
+        def get_food(model):
+            return sum(food.amount for food in model.schedule.agents if isinstance(food, Food))
+        
+        def get_home(model):
+            return model.home.amount
+        
+        model_reporters = {
+            'Ants 🐜': lambda mod: get_ants(mod),
+            'Food 🍯': lambda mod: get_food(mod),
+            'Home 🏠': lambda mod: get_home(mod)
+        }
+
+        self.datacollector = DataCollector(
+            model_reporters=model_reporters,
+            agent_reporters={}
+        )
+
     def step(self):
         """
         Have the scheduler advance each cell by one step
@@ -78,3 +104,7 @@ class AntWorld(Model):
         # stop when no food remains to collect
         if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
             self.running = False
+
+        # Record in datacollector
+        self.datacollector.collect(self)
+
