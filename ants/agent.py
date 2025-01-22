@@ -142,6 +142,7 @@ class Ant(Agent):
         self.drop = 0
         self.home = home
         self.moore = moore
+        self.steps_without_food = 0
 
     # derived from Sugarscape get_sugar()
     def get_item(self, item):
@@ -161,6 +162,13 @@ class Ant(Agent):
         If a HOMING agent is home, they deposit their food and return FORAGING,
         otherwise they drop pheromone and take one step closer to home.
         """
+
+        self.steps_without_food += 1
+        if self.steps_without_food > self.model.max_steps_without_food:
+            self.model.schedule.remove(self)
+            self.model.grid.remove_agent(self)
+            return
+        
         if self.state == "FORAGING":
             # Look for Food
             food = self.get_item(Food)
