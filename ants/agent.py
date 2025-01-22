@@ -110,12 +110,12 @@ class Food(Agent):
         if self.amount < 1:
             self.amount = 0
 
-    def eaten(self):
-        """
-        Removes one food if there are any available
-        """
-        if self.any_food():
-            self.amount -= 1
+    # def eaten(self):
+    #     """
+    #     Removes one food if there are any available
+    #     """
+    #     if self.any_food():
+    #         self.amount -= 1
 
     def any_food(self):
         """
@@ -142,6 +142,7 @@ class Ant(Agent):
         self.drop = 0
         self.home = home
         self.moore = moore
+        self.carrying = 10
 
     # derived from Sugarscape get_sugar()
     def get_item(self, item):
@@ -151,7 +152,15 @@ class Ant(Agent):
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         for agent in this_cell:
             if type(agent) is item:
+                print(agent)
                 return agent
+    
+    def consume_food(self):
+        """
+        Consume food from the available food
+        """
+        self.carrying -= self.model.consumption_rate
+
 
     def step(self):
         """
@@ -165,8 +174,10 @@ class Ant(Agent):
             # Look for Food
             food = self.get_item(Food)
 
+
             if food is not None and food.any_food(): # Eat the food and then head home
-                food.eaten()
+                food.amount -= self.model.carrying_capacity
+                self.carrying += self.model.carrying_capacity
                 self.state = "HOMING"
                 self.drop = self.model.initdrop
 
@@ -187,6 +198,8 @@ class Ant(Agent):
             else: #drop pheromone, and move toward home
                 self.drop_pheromone()
                 self.home_move()
+            
+        self.consume_food()
 
     def drop_pheromone(self):
         """
