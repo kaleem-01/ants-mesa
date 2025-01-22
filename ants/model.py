@@ -1,8 +1,8 @@
 from mesa import Model
 from mesa.time import SimultaneousActivation
 from mesa.space import MultiGrid
-
-from .agent import Environment, Ant, Food, Home, Predator
+from mesa.datacollection import DataCollector
+from .agent import Environment, Ant, Food, Home
 
 # derived from ConwaysGameOfLife
 class AntWorld(Model):
@@ -10,7 +10,7 @@ class AntWorld(Model):
     Represents the ants foraging for food.
     """
 
-    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=0, lowerbound=0.01, prob_random=0.1, drop_rate=0.1, decay_rate=0.01):
+    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9, decay_rate=0.01):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -23,6 +23,10 @@ class AntWorld(Model):
         self.prob_random = prob_random
         self.drop_rate = drop_rate
         self.decay_rate = decay_rate
+        self.max_steps_without_food = max_steps_without_food
+        self.birth_rate = birth_rate
+        self.consumption_rate = consumption_rate
+        self.carrying_capacity = carrying_capacity
 
         # Set up the grid and schedule.
 
@@ -39,6 +43,10 @@ class AntWorld(Model):
         homeloc = (25, 25)
         predator_loc = (30, 30)
         food_locs = ((22, 11), (35, 8), (18, 33))
+
+        # Setup the datacollector
+        self.setup_datacollector() 
+
 
         self.home = Home(self.next_id(), homeloc, self)
         self.grid.place_agent(self.home, homeloc)
@@ -70,6 +78,28 @@ class AntWorld(Model):
 
         self.running = True
 
+    def setup_datacollector(self):
+
+        def get_ants(model):
+            return sum(1 for agent in model.schedule.agents if isinstance(agent, Ant))
+        
+        def get_food(model):
+            return sum(food.amount for food in model.schedule.agents if isinstance(food, Food))
+        
+        def get_home(model):
+            return model.home.amount
+        
+        model_reporters = {
+            'Ants 🐜': lambda mod: get_ants(mod),
+            'Food 🍯': lambda mod: get_food(mod),
+            'Home 🏠': lambda mod: get_home(mod)
+        }
+
+        self.datacollector = DataCollector(
+            model_reporters=model_reporters,
+            agent_reporters={}
+        )
+
     def step(self):
         """
         Have the scheduler advance each cell by one step
@@ -83,3 +113,128 @@ class AntWorld(Model):
         # stop when no food remains to collect
         if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
             self.running = False
+
+        # Record in datacollector
+        self.datacollector.collect(self)
+
+        #birth of new ants
+
+        num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
+        for i in range(int(self.birth_rate * num_ants)):
+            ant = Ant(self.next_id(), self.home, self)
+            self.grid.place_agent(ant, self.home.pos)
+            self.schedule.add(ant)
+
+
+# from mesa import Model
+# from mesa.time import SimultaneousActivation
+# from mesa.space import MultiGrid
+# from mesa.datacollection import DataCollector
+# from .agent import Environment, Ant, Food, Home
+
+# # derived from ConwaysGameOfLife
+# class AntWorld(Model):
+#     """
+#     Represents the ants foraging for food.
+#     """
+
+#     def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, drop_rate=0.9, decay_rate=0.01, consumption_rate=0.1, carrying_capacity=1):
+#         """
+#         Create a new playing area of (height, width) cells.
+#         """
+#         print("Making World")
+#         super().__init__()
+#         self.evaporate = evaporate
+#         self.diffusion = diffusion
+#         self.initdrop = initdrop
+#         self.lowerbound = lowerbound
+#         self.prob_random = prob_random
+#         self.drop_rate = drop_rate
+#         self.decay_rate = decay_rate
+#         self.consumption_rate = consumption_rate
+#         self.carrying_capacity = carrying_capacity
+
+#         # Set up the grid and schedule.
+
+#         # Use SimultaneousActivation which simulates all the cells
+#         # computing their next state simultaneously.  This needs to
+#         # be done because each cell's next state depends on the current
+#         # state of all its neighbors -- before they've changed.
+#         self.schedule = SimultaneousActivation(self)
+
+#         # Use a simple grid, where edges wrap around.
+#         self.grid = MultiGrid(height, width, torus=True)
+
+#         # Define pos for the initial home and food locations
+#         homeloc = (25, 25)
+#         food_locs = ((22, 11), (35, 8), (18, 33))
+
+#         # Setup the datacollector
+#         self.setup_datacollector() 
+
+
+#         self.home = Home(self.next_id(), homeloc, self)
+#         self.grid.place_agent(self.home, homeloc)
+#         self.schedule.add(self.home)
+
+#         # Add in the ants
+#         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
+#         for i in range(100):
+#             ant = Ant(self.next_id(), self.home, self)
+#             self.grid.place_agent(ant, self.home.pos)
+#             self.schedule.add(ant)
+
+#         # Add the food locations
+#         for loc in food_locs:
+#             food = Food(self.next_id(), self)
+#             food.add(100)
+#             self.grid.place_agent(food, loc)
+#             self.schedule.add(food)
+
+#         # Place an environment cell at each location
+#         for contents, (x, y) in self.grid.coord_iter():
+#             cell = Environment(self.next_id(), (x, y), self)
+#             self.grid.place_agent(cell, (x, y))
+#             self.schedule.add(cell)
+
+#         self.running = True
+
+#     def setup_datacollector(self):
+
+#         def get_ants(model):
+#             return sum(1 for agent in model.schedule.agents if isinstance(agent, Ant))
+        
+#         def get_food(model):
+#             return sum(food.amount for food in model.schedule.agents if isinstance(food, Food))
+        
+#         def get_home(model):
+#             return model.home.amount
+        
+#         model_reporters = {
+#             'Ants 🐜': lambda mod: get_ants(mod),
+#             'Food 🍯': lambda mod: get_food(mod),
+#             'Home 🏠': lambda mod: get_home(mod)
+#         }
+
+#         self.datacollector = DataCollector(
+#             model_reporters=model_reporters,
+#             agent_reporters={}
+#         )
+
+#     def step(self):
+#         """
+#         Have the scheduler advance each cell by one step
+#         """
+#         self.schedule.step()
+
+#         # stop when all the food is collected
+#         # if self.home.amount == 300:
+#         #     self.running = False
+
+#         # stop when no food remains to collect
+#         if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
+#             self.running = False
+
+#         # Record in datacollector
+#         self.datacollector.collect(self)
+

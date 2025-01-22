@@ -111,12 +111,12 @@ class Food(Agent):
         if self.amount < 1:
             self.amount = 0
 
-    def eaten(self):
-        """
-        Removes one food if there are any available
-        """
-        if self.any_food():
-            self.amount -= 1
+    # def eaten(self):
+    #     """
+    #     Removes one food if there are any available
+    #     """
+    #     if self.any_food():
+    #         self.amount -= 1
 
     def any_food(self):
         """
@@ -143,6 +143,8 @@ class Ant(Agent):
         self.drop = 0
         self.home = home
         self.moore = moore
+        self.steps_without_food = 0
+        self.carrying = 10
 
     # derived from Sugarscape get_sugar()
     def get_item(self, item):
@@ -152,7 +154,15 @@ class Ant(Agent):
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         for agent in this_cell:
             if type(agent) is item:
+                print(agent)
                 return agent
+    
+    def consume_food(self):
+        """
+        Consume food from the available food
+        """
+        self.carrying -= self.model.consumption_rate
+
 
     def step(self):
         """
@@ -162,13 +172,23 @@ class Ant(Agent):
         If a HOMING agent is home, they deposit their food and return FORAGING,
         otherwise they drop pheromone and take one step closer to home.
         """
+
+        self.steps_without_food += 1
+        if self.steps_without_food > self.model.max_steps_without_food:
+            self.model.schedule.remove(self)
+            self.model.grid.remove_agent(self)
+            return
+        
         print(self.pos)
         if self.state == "FORAGING":
             # Look for Food
             food = self.get_item(Food)
 
+
             if food is not None and food.any_food(): # Eat the food and then head home
-                food.eaten()
+                self.steps_without_food = 0
+                food.amount -= self.model.carrying_capacity
+                self.carrying += self.model.carrying_capacity
                 self.state = "HOMING"
                 self.drop = self.model.initdrop
 
@@ -189,6 +209,8 @@ class Ant(Agent):
             else: #drop pheromone, and move toward home
                 self.drop_pheromone()
                 self.home_move()
+            
+        self.consume_food()
 
     def drop_pheromone(self):
         """
