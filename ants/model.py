@@ -161,6 +161,11 @@ class AntWorld(Model):
 
         self.remove_empty_food()
         self.make_food()
+
+
+    def run_model_for_steps(self, n):
+        for _ in range(n):
+            self.step()
         
 
     def remove_empty_food(self):
