@@ -154,7 +154,6 @@ class Ant(Agent):
         this_cell = self.model.grid.get_cell_list_contents([self.pos])
         for agent in this_cell:
             if type(agent) is item:
-                print(agent)
                 return agent
     
     # def consume_food(self):
@@ -173,13 +172,15 @@ class Ant(Agent):
         otherwise they drop pheromone and take one step closer to home.
         """
 
+        if self.pos is None:
+            return  # Skip step if the ant has been removed
+
         self.steps_without_food += 1
         if self.steps_without_food > self.model.max_steps_without_food:
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
             return
-        
-        print(self.pos)
+
         if self.state == "FORAGING":
             # Look for Food
             food = self.get_item(Food)
@@ -269,6 +270,11 @@ class Ant(Agent):
             self.random_move()
 
 class Predator(Agent):
+    """
+    Predators hunt and eat ants in their neighborhood. If no ants are nearby,
+    they move randomly within the grid. Each predator keeps track of the number
+    of ants it has eaten.
+    """
     def __init__(self, unique_id, model, moore=True):
         """
         Initialize the predator with its unique ID and behavior.
@@ -276,6 +282,7 @@ class Predator(Agent):
         super().__init__(unique_id, model)
         self.pos = (30, 30)
         self.moore = moore  # Determines movement style (Moore or Von Neumann neighborhood)
+        self.ants_eaten = 0
 
     def hunt(self):
         """
@@ -285,7 +292,6 @@ class Predator(Agent):
         ants = [n for n in neighbors if isinstance(n, Ant)]
 
         if ants:
-            print(ants)
             # If there are ants nearby, choose one randomly and move there
             target_ant = self.random.choice(ants)
             if target_ant is None:
@@ -303,6 +309,7 @@ class Predator(Agent):
         """
         self.model.grid.remove_agent(ant)
         self.model.schedule.remove(ant)  # Also remove it from the schedule
+        self.ants_eaten += 1
     
     def random_move(self):
         """
@@ -318,5 +325,4 @@ class Predator(Agent):
         """
         Execute one step of the predator's behavior.
         """
-        print(self.pos)
         self.hunt()
