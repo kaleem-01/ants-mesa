@@ -104,9 +104,11 @@ food_num_plot = ChartModule([{"Label": "Food 🍯", "Color": "blue"},
                              {"Label": "Home 🏠", "Color": "red"},
                              {"Label": "Carrying", "Color": "purple"}])
 
+dist_plot = ChartModule([{"Label": "Distance", "Color": "black"}])
+
 server = ModularServer(
     model_cls = AntWorld, 
-    visualization_elements=[canvas_element, ant_num_plot, food_num_plot], 
+    visualization_elements=[canvas_element, ant_num_plot, food_num_plot, dist_plot], 
     name="Ants", 
     model_params=model_params
 )

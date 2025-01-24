@@ -6,7 +6,7 @@ import random
 from .agent import Environment, Ant, Food, Home, Predator
 
 from .config import WIDTH, HEIGHT, EVAPORATE, DIFFUSION, INITDROP, LOWERBOUND, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, CONSUMPTION_RATE, CARRYING_CAPACITY, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS
-
+import math
 
 # derived from ConwaysGameOfLife
 class AntWorld(Model):
@@ -101,11 +101,28 @@ class AntWorld(Model):
         def get_carrying(model):
             return sum(ant.carrying for ant in model.schedule.agents if isinstance(ant, Ant))
         
+        def get_distance(pos_1, pos_2):
+            """ Get the distance between two points """          
+            x1, y1 = pos_1
+            x2, y2 = pos_2
+            dx = x1 - x2
+            dy = y1 - y2
+            return math.sqrt(dx**2 + dy**2)
+
+        def avg_dist_food_nest(self):
+            """
+            Calculate the average distance of food from the nest
+            """
+            food = [food for food in self.schedule.agents if isinstance(food, Food)]
+            return sum(get_distance(food.pos, self.home.pos) for food in food) / len(food)
+
+        
         model_reporters = {
             'Ants 🐜': lambda mod: get_ants(mod),
             'Food 🍯': lambda mod: get_food(mod),
             'Home 🏠': lambda mod: get_home(mod),
-            'Carrying': lambda mod: get_carrying(mod)
+            'Carrying': lambda mod: get_carrying(mod),
+            "Distance": lambda mod: avg_dist_food_nest(mod)
         }
 
         self.datacollector = DataCollector(
@@ -144,6 +161,7 @@ class AntWorld(Model):
 
         self.remove_empty_food()
         self.make_food()
+        
 
     def remove_empty_food(self):
         """
@@ -164,3 +182,4 @@ class AntWorld(Model):
             food.add(100)
             self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
             self.schedule.add(food)
+
