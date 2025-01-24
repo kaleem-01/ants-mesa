@@ -85,8 +85,8 @@ canvas_element = CanvasGrid(diffusion_portrayal, 50, 50, 500, 500)
 
 # derived from schelling
 model_params = {
-    "height": WIDTH,
-    "width": HEIGHT,
+    "height": HEIGHT,
+    "width": WIDTH,
     "evaporate": Slider("Pheromone Evaporation Rate", EVAPORATE, 0.01, 0.50, 0.01),
     "diffusion": Slider("Pheromone Diffusion Rate", DIFFUSION, 0.0, 1.0, 0.1),
     "initdrop": Slider("Initial Drop", INITDROP, 100, 1000, 50),
