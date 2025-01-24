@@ -78,7 +78,7 @@ class Home(Agent):
         Initializes the food amount to 0.
         """
         super().__init__(unique_id, model)
-        self.pos = pos
+        #self.pos = pos
         self.amount = 0
 
     def add(self, amount):
@@ -138,7 +138,7 @@ class Ant(Agent):
     """
     def __init__(self, unique_id, home, model, moore=True):
         super().__init__(unique_id, model)
-        self.pos = home.pos
+        #self.pos = home.pos
         self.state = "FORAGING"
         self.drop = 0
         self.home = home
@@ -280,9 +280,11 @@ class Predator(Agent):
         Initialize the predator with its unique ID and behavior.
         """
         super().__init__(unique_id, model)
-        self.pos = (30, 30)
+        #self.pos = (30, 30)
         self.moore = moore  # Determines movement style (Moore or Von Neumann neighborhood)
         self.ants_eaten = 0
+        self.catch_streak = 0
+        self.meal_sizes = []
 
     def hunt(self):
         """
@@ -301,6 +303,8 @@ class Predator(Agent):
                 self.catch(target_ant)
         else:
             # Otherwise, move randomly
+            self.meal_sizes.append(self.catch_streak)
+            self.catch_streak = 0
             self.random_move()
 
     def catch(self, ant):
@@ -310,6 +314,7 @@ class Predator(Agent):
         self.model.grid.remove_agent(ant)
         self.model.schedule.remove(ant)  # Also remove it from the schedule
         self.ants_eaten += 1
+        self.catch_streak += 1
     
     def random_move(self):
         """
