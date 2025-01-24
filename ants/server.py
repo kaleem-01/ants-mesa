@@ -115,4 +115,4 @@ server = ModularServer(
     model_params=model_params
 )
 
-server.port = 8200
+server.port = 8234
