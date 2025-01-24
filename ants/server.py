@@ -94,6 +94,8 @@ model_params = {
     "max_steps_without_food": Slider("Max steps without food", 500, 0, 500, 10),
     "birth_rate": Slider("Birth rate", 0.001, 0.0, 0.1, 0.001),
     "num_predators": Slider("Number of Predators", 1, 0, 5, 1),
+    "num_food_locs": Slider("Number of Food Locations", 5, 1, 10, 1),
+    "num_ants": Slider("Number of Ants", 100, 1, 500, 10)
 }
 
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},])
@@ -109,4 +111,4 @@ server = ModularServer(
     model_params=model_params
 )
 
-server.port = 8521
+server.port = 8200

@@ -5,15 +5,16 @@ from mesa.datacollection import DataCollector
 import random
 from .agent import Environment, Ant, Food, Home, Predator
 
+from .config import WIDTH, HEIGHT, EVAPORATE, DIFFUSION, INITDROP, LOWERBOUND, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, CONSUMPTION_RATE, CARRYING_CAPACITY, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS
+
+
 # derived from ConwaysGameOfLife
 class AntWorld(Model):
     """
     Represents the ants foraging for food.
     """
 
-    def __init__(self, height=50, width=50, evaporate=0.5, diffusion=1, initdrop=100, lowerbound=0.01, prob_random=0.1, 
-                 drop_rate=0.9, decay_rate=0.01, max_steps_without_food=500, birth_rate=0.001, consumption_rate=0.001,
-                 carrying_capacity=1, num_predators=1):
+    def __init__(self, height=HEIGHT, width=WIDTH, evaporate=EVAPORATE, diffusion=DIFFUSION, initdrop=INITDROP, lowerbound=LOWERBOUND, prob_random=PROB_RANDOM, drop_rate=DROP_RATE, decay_rate=DECAY_RATE, max_steps_without_food=MAX_STEPS_WITHOUT_FOOD, birth_rate=BIRTH_RATE, consumption_rate=CONSUMPTION_RATE, carrying_capacity=CARRYING_CAPACITY, num_predators=NUM_PREDATORS, num_food_locs=NUM_FOOD_LOCS, num_ants=NUM_ANTS):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -31,6 +32,8 @@ class AntWorld(Model):
         self.consumption_rate = consumption_rate
         self.carrying_capacity = carrying_capacity
         self.num_predators = num_predators
+        self.num_food_locs = num_food_locs
+        self.num_ants = num_ants
 
         # Set up the grid and schedule.
 
@@ -63,16 +66,17 @@ class AntWorld(Model):
 
         # Add in the ants
         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
-        for i in range(100):
+        for i in range(self.num_ants):
             ant = Ant(self.next_id(), self.home, self)
             self.grid.place_agent(ant, self.home.pos)
             self.schedule.add(ant)
 
         # Add the food locations
-        for loc in food_locs:
+        for each_food_site in range(self.num_food_locs):
             food = Food(self.next_id(), self)
             food.add(100)
-            self.grid.place_agent(food, loc)
+            self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
+            # self.grid.place_agent(food, loc)
             self.schedule.add(food)
 
         # Place an environment cell at each location
@@ -133,3 +137,30 @@ class AntWorld(Model):
             ant = Ant(self.next_id(), self.home, self)
             self.grid.place_agent(ant, self.home.pos)
             self.schedule.add(ant)
+        
+        # Stop simulation if all ants are dead
+        if num_ants == 0:
+            self.running = False
+
+        self.remove_empty_food()
+        self.make_food()
+
+    def remove_empty_food(self):
+        """
+        Remove all food objects with no food left
+        """
+        for food in [food for food in self.schedule.agents if isinstance(food, Food)]:
+            if food.amount == 0:
+                self.grid.remove_agent(food)
+                self.schedule.remove(food)
+
+    def make_food(self):
+        """
+        Create a new food object
+        """
+        food_locs = sum(1 for food in self.schedule.agents if isinstance(food, Food))
+        if food_locs < self.num_food_locs:
+            food = Food(self.next_id(), self)
+            food.add(100)
+            self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
+            self.schedule.add(food)
