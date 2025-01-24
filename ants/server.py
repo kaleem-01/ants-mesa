@@ -7,6 +7,8 @@ from .model import AntWorld
 from .agent import Environment, Ant, Food, Home, Predator
 import math
 
+from .config import HEIGHT, WIDTH, EVAPORATE, DIFFUSION, INITDROP, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS
+
 
 def log_norm(value, lower, upper):
     """
@@ -83,19 +85,19 @@ canvas_element = CanvasGrid(diffusion_portrayal, 50, 50, 500, 500)
 
 # derived from schelling
 model_params = {
-    "height": 50,
-    "width": 50,
-    "evaporate": Slider("Pheromone Evaporation Rate", 0.50, 0.01, 0.50, 0.01),
-    "diffusion": Slider("Pheromone Diffusion Rate", 1.0, 0.0, 1.0, 0.1),
-    "initdrop": Slider("Initial Drop", 100, 100, 1000, 50),
-    "prob_random": Slider("Random Move Probability", 0.1, 0.0, 1.0, 0.1),
-    "drop_rate": Slider("Drop Decay Rate", 0.9, 0, 1, 0.01),
-    "decay_rate": Slider("Food Decay Rate", 0.01, 0.0, 0.1, 0.001),
-    "max_steps_without_food": Slider("Max steps without food", 500, 0, 500, 10),
-    "birth_rate": Slider("Birth rate", 0.001, 0.0, 0.1, 0.001),
-    "num_predators": Slider("Number of Predators", 1, 0, 5, 1),
-    "num_food_locs": Slider("Number of Food Locations", 5, 1, 10, 1),
-    "num_ants": Slider("Number of Ants", 100, 1, 500, 10)
+    "height": WIDTH,
+    "width": HEIGHT,
+    "evaporate": Slider("Pheromone Evaporation Rate", EVAPORATE, 0.01, 0.50, 0.01),
+    "diffusion": Slider("Pheromone Diffusion Rate", DIFFUSION, 0.0, 1.0, 0.1),
+    "initdrop": Slider("Initial Drop", INITDROP, 100, 1000, 50),
+    "prob_random": Slider("Random Move Probability", PROB_RANDOM, 0.0, 1.0, 0.1),
+    "drop_rate": Slider("Drop Decay Rate", DROP_RATE, 0, 1, 0.01),
+    "decay_rate": Slider("Food Decay Rate", DECAY_RATE, 0.0, 0.1, 0.001),
+    "max_steps_without_food": Slider("Max steps without food", MAX_STEPS_WITHOUT_FOOD, 0, 500, 10),
+    "birth_rate": Slider("Birth rate", BIRTH_RATE, 0.0, 0.1, 0.001),
+    "num_predators": Slider("Number of Predators", NUM_PREDATORS, 0, 5, 1),
+    "num_food_locs": Slider("Number of Food Locations", NUM_FOOD_LOCS, 1, 10, 1),
+    "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 500, 10)
 }
 
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},])
