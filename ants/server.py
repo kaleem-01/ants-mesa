@@ -7,7 +7,7 @@ from .model import AntWorld
 from .agent import Environment, Ant, Food, Home, Predator
 import math
 
-from .config import HEIGHT, WIDTH, EVAPORATE, DIFFUSION, INITDROP, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS
+from .config import HEIGHT, WIDTH, EVAPORATE, DIFFUSION, INITDROP, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS, MAX_STEPS_WITHOUT_ANTS, REPRODUCTION_THRESHOLD, PREDATOR_LIFETIME
 
 
 def log_norm(value, lower, upper):
@@ -93,14 +93,18 @@ model_params = {
     "prob_random": Slider("Random Move Probability", PROB_RANDOM, 0.0, 1.0, 0.1),
     "drop_rate": Slider("Drop Decay Rate", DROP_RATE, 0, 1, 0.01),
     "decay_rate": Slider("Food Decay Rate", DECAY_RATE, 0.0, 0.1, 0.001),
-    "max_steps_without_food": Slider("Max steps without food", MAX_STEPS_WITHOUT_FOOD, 0, 500, 10),
+    "max_steps_without_food": Slider("Max steps without food", MAX_STEPS_WITHOUT_FOOD, 0, 10000, 10),
     "birth_rate": Slider("Birth rate", BIRTH_RATE, 0.0, 0.1, 0.001),
-    "num_predators": Slider("Number of Predators", NUM_PREDATORS, 0, 5, 1),
+    "num_predators": Slider("Number of Predators", NUM_PREDATORS, 0, 30, 1),
     "num_food_locs": Slider("Number of Food Locations", NUM_FOOD_LOCS, 1, 10, 1),
-    "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 500, 10)
+    "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 2000, 10),
+    "max_steps_without_ants": Slider("Max steps without ants", MAX_STEPS_WITHOUT_ANTS, 0, 500, 10),
+    "reproduction_threshold": Slider("Reproduction threshold predators", REPRODUCTION_THRESHOLD, 0, 100, 10),
+    "predator_lifetime": Slider("Predator Lifetime", PREDATOR_LIFETIME, 0, 1000, 10)
 }
 
-ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},])
+ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},
+                            {"Label": "Predators", "Color": "red"}])
 
 food_num_plot = ChartModule([{"Label": "Food 🍯", "Color": "blue"},
                              {"Label": "Home 🏠", "Color": "red"},
