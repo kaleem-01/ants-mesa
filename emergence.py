@@ -72,80 +72,7 @@ def run_many_ants_eaten(iteration):
     return ants_eaten_by_predators
 
 
-with ProcessPoolExecutor(max_workers=10) as executor:
-    futures = executor.map(run_many_ants_eaten, range(trials_per_setting))
-
-results = list(futures)
-ants_eaten_by_predator = reduce(lambda x, y: x + y, results)
-
-# %% [markdown]
-# ## Distribution of ants eaten by predator
-
-# %%
-plt.figure(figsize=(8, 6))
-plt.hist(ants_eaten_by_predator, bins=10, density=True, alpha=0.7, color='blue')
-plt.title("Distribution of Ants Eaten by Predators")
-plt.xlabel("Number of Ants Eaten")
-plt.ylabel("Frequency")
-plt.grid(True)
-plt.show()
-
-
-# %%
-# Fit a power law
-results = powerlaw.Fit(ants_eaten_by_predators)
-
-plt.figure(figsize=(8, 6))
-results.plot_pdf(color='blue', linestyle='-', label='Empirical Data')
-results.power_law.plot_pdf(color='red', linestyle='--', label='Power Law Fit')
-plt.title("Power Law Fit of Ants Eaten Distribution")
-plt.xlabel("Number of Ants Eaten")
-plt.ylabel("Probability Density")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-# %% [markdown]
-# ### Meal sizes
-
-# %%
-height = 50
-width = 50
-num_predators = 1
-
-# %%
-model = AntWorld(height=height, width=width, num_predators=num_predators)
-model.run_model()
-
-for agent in model.schedule.agents:
-    if isinstance(agent, Predator):
-            meal_sizes = agent.meal_sizes
-
-# %%
-plt.figure(figsize=(8, 6))
-plt.hist(meal_sizes, bins=10, density=True, alpha=0.7, color='blue')
-plt.title("Distribution of Meal Sizes")
-plt.xlabel("Number of Ants Eaten")
-plt.ylabel("Frequency")
-plt.grid(True)
-plt.show()
-
-# %%
-# Fit a power law
-results = powerlaw.Fit(meal_sizes)
-
-plt.figure(figsize=(8, 6))
-results.plot_pdf(color='blue', linestyle='-', label='Empirical Data')
-results.power_law.plot_pdf(color='red', linestyle='--', label='Power Law Fit')
-plt.title("Power Law Fit of Ants Eaten Distribution")
-plt.xlabel("Number of Ants Eaten")
-plt.ylabel("Probability Density")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-
-if __name__ == "__main__":
+def main():
     random_move_probs = np.linspace(0.0, 1.0, 10)
 
     with ProcessPoolExecutor(max_workers=10) as executor:
@@ -189,7 +116,85 @@ if __name__ == "__main__":
     # ### Powerlaw distribution eaten ants
 
     # %%
-    height = 50
-    width = 50
-    trials_per_setting = 20
-    num_predators = 10
+    # height = 50
+    # width = 50
+    # trials_per_setting = 20
+    # num_predators = 10
+
+    # with ProcessPoolExecutor(max_workers=10) as executor:
+    # futures = executor.map(run_many_ants_eaten, range(trials_per_setting))
+
+    # results = list(futures)
+    # ants_eaten_by_predator = reduce(lambda x, y: x + y, results)
+
+    # # %% [markdown]
+    # # ## Distribution of ants eaten by predator
+
+    # # %%
+    # plt.figure(figsize=(8, 6))
+    # plt.hist(ants_eaten_by_predator, bins=10, density=True, alpha=0.7, color='blue')
+    # plt.title("Distribution of Ants Eaten by Predators")
+    # plt.xlabel("Number of Ants Eaten")
+    # plt.ylabel("Frequency")
+    # plt.grid(True)
+    # plt.show()
+
+
+    # # %%
+    # # Fit a power law
+    # results = powerlaw.Fit(ants_eaten_by_predators)
+
+    # plt.figure(figsize=(8, 6))
+    # results.plot_pdf(color='blue', linestyle='-', label='Empirical Data')
+    # results.power_law.plot_pdf(color='red', linestyle='--', label='Power Law Fit')
+    # plt.title("Power Law Fit of Ants Eaten Distribution")
+    # plt.xlabel("Number of Ants Eaten")
+    # plt.ylabel("Probability Density")
+    # plt.legend()
+    # plt.grid(True)
+    # plt.show()
+
+    # # %% [markdown]
+    # # ### Meal sizes
+
+    # # %%
+    # height = 50
+    # width = 50
+    # num_predators = 1
+
+    # # %%
+    # model = AntWorld(height=height, width=width, num_predators=num_predators)
+    # model.run_model()
+
+    # for agent in model.schedule.agents:
+    #     if isinstance(agent, Predator):
+    #             meal_sizes = agent.meal_sizes
+
+    # # %%
+    # plt.figure(figsize=(8, 6))
+    # plt.hist(meal_sizes, bins=10, density=True, alpha=0.7, color='blue')
+    # plt.title("Distribution of Meal Sizes")
+    # plt.xlabel("Number of Ants Eaten")
+    # plt.ylabel("Frequency")
+    # plt.grid(True)
+    # plt.show()
+
+    # # %%
+    # # Fit a power law
+    # results = powerlaw.Fit(meal_sizes)
+
+    # plt.figure(figsize=(8, 6))
+    # results.plot_pdf(color='blue', linestyle='-', label='Empirical Data')
+    # results.power_law.plot_pdf(color='red', linestyle='--', label='Power Law Fit')
+    # plt.title("Power Law Fit of Ants Eaten Distribution")
+    # plt.xlabel("Number of Ants Eaten")
+    # plt.ylabel("Probability Density")
+    # plt.legend()
+    # plt.grid(True)
+    # plt.show()
+
+
+
+if __name__ == "__main__":
+    main()
+
