@@ -295,6 +295,7 @@ class Predator(Agent):
         self.meal_sizes = []
         self.steps_without_ants = 0
         self.lifetime = self.model.predator_lifetime
+        self.model.all_predators.append(self)
     
     def gradient_move(self):
         """

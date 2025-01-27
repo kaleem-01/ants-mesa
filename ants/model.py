@@ -39,6 +39,9 @@ class AntWorld(Model):
         self.reproduction_threshold = reproduction_threshold
         self.predator_lifetime = predator_lifetime
 
+        self.all_predators = []
+        self.all_ants = []
+
         # Set up the grid and schedule.
 
         # Use SimultaneousActivation which simulates all the cells
