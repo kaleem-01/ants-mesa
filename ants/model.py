@@ -5,7 +5,7 @@ from mesa.datacollection import DataCollector
 import random
 from .agent import Environment, Ant, Food, Home, Predator
 
-from .config import WIDTH, HEIGHT, EVAPORATE, DIFFUSION, INITDROP, LOWERBOUND, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, CONSUMPTION_RATE, CARRYING_CAPACITY, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS
+from .config import WIDTH, HEIGHT, EVAPORATE, DIFFUSION, INITDROP, LOWERBOUND, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, CONSUMPTION_RATE, CARRYING_CAPACITY, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS, MAX_STEPS_WITHOUT_ANTS, REPRODUCTION_THRESHOLD, PREDATOR_LIFETIME
 import math
 
 # derived from ConwaysGameOfLife
@@ -14,7 +14,7 @@ class AntWorld(Model):
     Represents the ants foraging for food.
     """
 
-    def __init__(self, height=HEIGHT, width=WIDTH, evaporate=EVAPORATE, diffusion=DIFFUSION, initdrop=INITDROP, lowerbound=LOWERBOUND, prob_random=PROB_RANDOM, drop_rate=DROP_RATE, decay_rate=DECAY_RATE, max_steps_without_food=MAX_STEPS_WITHOUT_FOOD, birth_rate=BIRTH_RATE, consumption_rate=CONSUMPTION_RATE, carrying_capacity=CARRYING_CAPACITY, num_predators=NUM_PREDATORS, num_food_locs=NUM_FOOD_LOCS, num_ants=NUM_ANTS):
+    def __init__(self, height=HEIGHT, width=WIDTH, evaporate=EVAPORATE, diffusion=DIFFUSION, initdrop=INITDROP, lowerbound=LOWERBOUND, prob_random=PROB_RANDOM, drop_rate=DROP_RATE, decay_rate=DECAY_RATE, max_steps_without_food=MAX_STEPS_WITHOUT_FOOD, birth_rate=BIRTH_RATE, consumption_rate=CONSUMPTION_RATE, carrying_capacity=CARRYING_CAPACITY, num_predators=NUM_PREDATORS, num_food_locs=NUM_FOOD_LOCS, num_ants=NUM_ANTS, max_steps_without_ants=MAX_STEPS_WITHOUT_ANTS, reproduction_threshold=REPRODUCTION_THRESHOLD, predator_lifetime=PREDATOR_LIFETIME):
         """
         Create a new playing area of (height, width) cells.
         """
@@ -34,6 +34,10 @@ class AntWorld(Model):
         self.num_predators = num_predators
         self.num_food_locs = num_food_locs
         self.num_ants = num_ants
+        self.state_counts_over_time = []
+        self.max_steps_without_ants = max_steps_without_ants
+        self.reproduction_threshold = reproduction_threshold
+        self.predator_lifetime = predator_lifetime
 
         # Set up the grid and schedule.
 
@@ -58,11 +62,16 @@ class AntWorld(Model):
         self.grid.place_agent(self.home, homeloc)
         self.schedule.add(self.home)
 
-        for _ in range(self.num_predators):
-            predator_loc = (random.randint(0, height - 1), random.randint(0, width - 1))
+        if self.num_predators > 0:
             predator = Predator(self.next_id(), self)
-            self.grid.place_agent(predator, predator_loc)
+            self.grid.place_agent(predator, homeloc)
             self.schedule.add(predator)
+
+            for _ in range(self.num_predators-1):
+                predator_loc = (random.randint(0, height - 1), random.randint(0, width - 1))
+                predator = Predator(self.next_id(), self)
+                self.grid.place_agent(predator, predator_loc)
+                self.schedule.add(predator)
 
         # Add in the ants
         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
@@ -92,6 +101,9 @@ class AntWorld(Model):
         def get_ants(model):
             return sum(1 for agent in model.schedule.agents if isinstance(agent, Ant))
         
+        def get_predators(model):
+            return sum(1 for agent in model.schedule.agents if isinstance(agent, Predator))
+        
         def get_food(model):
             return sum(food.amount for food in model.schedule.agents if isinstance(food, Food))
         
@@ -119,6 +131,7 @@ class AntWorld(Model):
         
         model_reporters = {
             'Ants 🐜': lambda mod: get_ants(mod),
+            'Predators': lambda mod: get_predators(mod),
             'Food 🍯': lambda mod: get_food(mod),
             'Home 🏠': lambda mod: get_home(mod),
             'Carrying': lambda mod: get_carrying(mod),
@@ -150,7 +163,7 @@ class AntWorld(Model):
         #birth of new ants
 
         num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
-        for i in range(int(self.birth_rate * num_ants)):
+        for i in range(max(int(self.birth_rate * num_ants), 1)):
             ant = Ant(self.next_id(), self.home, self)
             self.grid.place_agent(ant, self.home.pos)
             self.schedule.add(ant)
@@ -158,6 +171,12 @@ class AntWorld(Model):
         # Stop simulation if all ants are dead
         if num_ants == 0:
             self.running = False
+            print("Stopping: No ants left")
+        
+        # Stop simulation if all predators are dead
+        if self.num_predators > 0 and not any(isinstance(agent, Predator) for agent in self.schedule.agents):
+            self.running = False
+            print("Stopping: No predators left")
 
         self.remove_empty_food()
         self.make_food()

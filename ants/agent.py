@@ -293,27 +293,35 @@ class Predator(Agent):
         self.ants_eaten = 0
         self.catch_streak = 0
         self.meal_sizes = []
+        self.steps_without_ants = 0
+        self.lifetime = self.model.predator_lifetime
+    
+    def gradient_move(self):
+        """
+        Move the predator based on nearby ant density.
+        """
+        neighbors = self.model.grid.get_neighborhood(self.pos, self.moore, include_center=False)
+        ant_density = {cell: len([obj for obj in self.model.grid.get_cell_list_contents([cell]) if isinstance(obj, Ant)]) for cell in neighbors}
+
+        max_density = max(ant_density.values())
+        target_cells = [cell for cell, density in ant_density.items() if density == max_density]
+        next_move = self.random.choice(target_cells)
+        self.model.grid.move_agent(self, next_move)
 
     def hunt(self):
         """
-        The predator will hunt for ants in its neighborhood.
+        Check for ants at the predator's current position and catch one if any exist.
         """
-        neighbors = self.model.grid.get_neighbors(self.pos, self.moore, include_center=False)
-        ants = [n for n in neighbors if isinstance(n, Ant)]
-
+        cell_contents = self.model.grid.get_cell_list_contents([self.pos])
+        ants = [obj for obj in cell_contents if isinstance(obj, Ant)]
         if ants:
-            # If there are ants nearby, choose one randomly and move there
+            # Catch only one ant (choose randomly if multiple are present)
             target_ant = self.random.choice(ants)
-            if target_ant is None:
-                random.move()
-            else:
-                self.model.grid.move_agent(self, target_ant.pos)
-                self.catch(target_ant)
+            self.catch(target_ant)
         else:
-            # Otherwise, move randomly
+            self.steps_without_ants += 1
             self.meal_sizes.append(self.catch_streak)
             self.catch_streak = 0
-            self.random_move()
 
     def catch(self, ant):
         """
@@ -323,6 +331,7 @@ class Predator(Agent):
         self.model.schedule.remove(ant)  # Also remove it from the schedule
         self.ants_eaten += 1
         self.catch_streak += 1
+        self.steps_without_ants = 0
     
     def random_move(self):
         """
@@ -333,9 +342,35 @@ class Predator(Agent):
         next_move = self.random.choice(next_moves)
         # Now move:
         self.model.grid.move_agent(self, next_move)
+    
+    def reproduce(self):
+        """
+        Create a new predator when reproduction conditions are met.
+        """
+        offspring = Predator(self.model.next_id(), self.model, self.moore)
+        #self.model.grid.place_agent(offspring, self.pos)
+        self.model.grid.place_agent(offspring, (random.randint(0, self.model.grid.width - 1), random.randint(0, self.model.grid.height - 1)))
+        self.model.schedule.add(offspring)
+
+        self.ants_eaten = 0
 
     def step(self):
         """
         Execute one step of the predator's behavior.
         """
+        self.lifetime -= 1
+
+        if self.lifetime <= 0 or self.steps_without_ants > self.model.max_steps_without_ants:
+            self.model.schedule.remove(self)
+            self.model.grid.remove_agent(self)
+            return
+        
+        if self.random.random() < self.model.prob_random:
+            self.random_move()
+        else:
+            self.gradient_move()
+
         self.hunt()
+        
+        if self.ants_eaten >= self.model.reproduction_threshold:
+            self.reproduce()
