@@ -365,7 +365,7 @@ class Predator(Agent):
             self.model.grid.remove_agent(self)
             return
         
-        if self.random.random() < self.model.prob_random:
+        if self.random.random() < 0.3:
             self.random_move()
         else:
             self.gradient_move()

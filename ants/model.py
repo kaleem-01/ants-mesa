@@ -83,7 +83,7 @@ class AntWorld(Model):
         # Add the food locations
         for each_food_site in range(self.num_food_locs):
             food = Food(self.next_id(), self)
-            food.add(100)
+            food.add(1000)
             self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
             # self.grid.place_agent(food, loc)
             self.schedule.add(food)
@@ -203,7 +203,7 @@ class AntWorld(Model):
         food_locs = sum(1 for food in self.schedule.agents if isinstance(food, Food))
         if food_locs < self.num_food_locs:
             food = Food(self.next_id(), self)
-            food.add(100)
+            food.add(1000)
             self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
             self.schedule.add(food)
 
