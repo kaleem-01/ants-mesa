@@ -41,6 +41,8 @@ class AntWorld(Model):
 
         self.all_predators = []
         self.all_ants = []
+        self.pheromone_ant_count = 0
+        self.pher_count_list = []
 
         # Set up the grid and schedule.
 
@@ -86,8 +88,9 @@ class AntWorld(Model):
         # Add the food locations
         for each_food_site in range(self.num_food_locs):
             food = Food(self.next_id(), self)
-            food.add(1000)
-            self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
+            food.add(100)
+            #non random food
+            self.grid.place_agent(food, food_locs[each_food_site])
             # self.grid.place_agent(food, loc)
             self.schedule.add(food)
 
@@ -166,7 +169,7 @@ class AntWorld(Model):
         #birth of new ants
 
         num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
-        for i in range(max(int(self.birth_rate * num_ants), 1)):
+        for i in range(max(int(self.birth_rate * num_ants), 0)):
             ant = Ant(self.next_id(), self.home, self)
             self.grid.place_agent(ant, self.home.pos)
             self.schedule.add(ant)
@@ -182,7 +185,14 @@ class AntWorld(Model):
             print("Stopping: No predators left")
 
         self.remove_empty_food()
-        self.make_food()
+        #self.make_food()
+
+        self.pheromone_ant_count = self.pheromone_ant_count / self.num_ants
+        print(self.pheromone_ant_count)
+        self.pher_count_list.append(self.pheromone_ant_count)
+        self.pheromone_ant_count = 0
+
+
 
 
     def run_model_for_steps(self, n):
@@ -206,7 +216,7 @@ class AntWorld(Model):
         food_locs = sum(1 for food in self.schedule.agents if isinstance(food, Food))
         if food_locs < self.num_food_locs:
             food = Food(self.next_id(), self)
-            food.add(1000)
+            food.add(100)
             self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
             self.schedule.add(food)
 

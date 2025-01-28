@@ -274,6 +274,7 @@ class Ant(Agent):
         # When something looks interesting, move there, otherwise randomly move
         if maxp > self.model.lowerbound:
             self.model.grid.move_agent(self, where)
+            self.model.pheromone_ant_count += 1
         else:
             self.random_move()
 
