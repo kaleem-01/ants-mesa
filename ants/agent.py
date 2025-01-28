@@ -78,7 +78,8 @@ class Home(Agent):
         Initializes the food amount to 0.
         """
         super().__init__(unique_id, model)
-        #self.pos = pos
+        self.pos = pos
+        self.model = model
         self.amount = 0
 
     def add(self, amount):
@@ -191,7 +192,7 @@ class Ant(Agent):
 
         if self.state == "FORAGING":
             # Look for Food
-            food = self.get_item(Food,radius=3)
+            food = self.get_item(Food,radius=self.model.fov)
 
 
             if food is not None and food.any_food(): # Eat the food and then head home
@@ -220,6 +221,8 @@ class Ant(Agent):
             else: #drop pheromone, and move toward home
                 self.drop_pheromone()
                 self.home_move()
+
+        self.model.occupied_cells.append(self.pos)
             
         # self.consume_food()
 

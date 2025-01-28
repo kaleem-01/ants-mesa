@@ -85,22 +85,22 @@ canvas_element = CanvasGrid(diffusion_portrayal, 50, 50, 500, 500)
 
 # derived from schelling
 model_params = {
-    "height": HEIGHT,
-    "width": WIDTH,
-    "evaporate": Slider("Pheromone Evaporation Rate", EVAPORATE, 0.01, 0.50, 0.01),
-    "diffusion": Slider("Pheromone Diffusion Rate", DIFFUSION, 0.0, 1.0, 0.1),
-    "initdrop": Slider("Initial Drop", INITDROP, 100, 1000, 50),
-    "prob_random": Slider("Random Move Probability", PROB_RANDOM, 0.0, 1.0, 0.1),
-    "drop_rate": Slider("Drop Decay Rate", DROP_RATE, 0, 1, 0.01),
-    "decay_rate": Slider("Food Decay Rate", DECAY_RATE, 0.0, 0.1, 0.001),
-    "max_steps_without_food": Slider("Max steps without food", MAX_STEPS_WITHOUT_FOOD, 0, 10000, 10),
-    "birth_rate": Slider("Birth rate", BIRTH_RATE, 0.0, 0.1, 0.001),
-    "num_predators": Slider("Number of Predators", NUM_PREDATORS, 0, 30, 1),
-    "num_food_locs": Slider("Number of Food Locations", NUM_FOOD_LOCS, 1, 10, 1),
-    "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 2000, 10),
-    "max_steps_without_ants": Slider("Max steps without ants", MAX_STEPS_WITHOUT_ANTS, 0, 500, 10),
+    # "height": HEIGHT,
+    # "width": WIDTH,
+    # "evaporate": Slider("Pheromone Evaporation Rate", EVAPORATE, 0.01, 0.50, 0.01),
+    # "diffusion": Slider("Pheromone Diffusion Rate", DIFFUSION, 0.0, 1.0, 0.1),
+    # "initdrop": Slider("Initial Drop", INITDROP, 100, 1000, 50),
+    "prob_random": Slider("Random Move Probability", PROB_RANDOM, 0.0, 1, 0.05),
+    # "drop_rate": Slider("Drop Decay Rate", DROP_RATE, 0, 1, 0.01),
+    # "decay_rate": Slider("Food Decay Rate", DECAY_RATE, 0.0, 0.1, 0.001),
+    "max_steps_without_food": Slider("Max steps without food", MAX_STEPS_WITHOUT_FOOD, 0, 100, 10),
+    "birth_rate": Slider("Birth rate", BIRTH_RATE, 0.0, 0.001, 0.0001),
+    # "num_predators": Slider("Number of Predators", NUM_PREDATORS, 0, 30, 1),
+    # "num_food_locs": Slider("Number of Food Locations", NUM_FOOD_LOCS, 1, 10, 1),
+    # "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 2000, 10),
+    "max_steps_without_ants": Slider("Max steps without ants", MAX_STEPS_WITHOUT_ANTS, 0, 100, 10),
     "reproduction_threshold": Slider("Reproduction threshold predators", REPRODUCTION_THRESHOLD, 0, 100, 10),
-    "predator_lifetime": Slider("Predator Lifetime", PREDATOR_LIFETIME, 0, 1000, 10)
+    # "predator_lifetime": Slider("Predator Lifetime", PREDATOR_LIFETIME, 0, 1000, 10)
 }
 
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},
