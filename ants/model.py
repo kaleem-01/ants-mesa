@@ -57,7 +57,7 @@ class AntWorld(Model):
 
         # Define pos for the initial home and food locations
         homeloc = (25, 25)
-        food_locs = ((22, 11), (35, 8), (18, 33))
+        food_locs = ((40, 40 ), (35, 10), (5, 33))
 
         # Setup the datacollector
         self.setup_datacollector() 
@@ -188,7 +188,7 @@ class AntWorld(Model):
         #self.make_food()
 
         self.pheromone_ant_count = self.pheromone_ant_count / self.num_ants
-        print(self.pheromone_ant_count)
+        #print(self.pheromone_ant_count)
         self.pher_count_list.append(self.pheromone_ant_count)
         self.pheromone_ant_count = 0
 
