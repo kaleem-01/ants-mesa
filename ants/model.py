@@ -32,17 +32,18 @@ class AntWorld(Model):
         self.birth_rate = kwargs.get('birth_rate', BIRTH_RATE)
         self.reproduction_threshold = kwargs.get('reproduction_threshold', REPRODUCTION_THRESHOLD)
         self.num_ants = kwargs.get('num_ants', NUM_ANTS)
+        self.num_predators = kwargs.get('num_predators', NUM_PREDATORS)
+        self.evaporate = kwargs.get('evaporate', EVAPORATE)
+        self.diffusion = kwargs.get('diffusion', DIFFUSION)
+        self.initdrop = kwargs.get('initdrop', INITDROP)
+        self.lowerbound = kwargs.get('lowerbound', LOWERBOUND)
+        self.drop_rate = kwargs.get('drop_rate', DROP_RATE)
+        self.decay_rate = kwargs.get('decay_rate', DECAY_RATE)
+        self.consumption_rate = kwargs.get('consumption_rate', CONSUMPTION_RATE)
+        self.carrying_capacity = kwargs.get('carrying_capacity', CARRYING_CAPACITY)
+        # self.num_food_locs = kwargs.get('num_food_locs', NUM_FOOD_LOCS)
+        
             
-
-        self.evaporate = EVAPORATE
-        self.diffusion = DIFFUSION
-        self.initdrop = INITDROP
-        self.lowerbound = LOWERBOUND
-        self.drop_rate = DROP_RATE
-        self.decay_rate = DECAY_RATE
-        self.consumption_rate = CONSUMPTION_RATE
-        self.carrying_capacity = CARRYING_CAPACITY
-        self.num_predators = NUM_PREDATORS
         self.num_food_locs = NUM_FOOD_LOCS
         self.state_counts_over_time = []
         self.predator_lifetime = PREDATOR_LIFETIME
@@ -175,7 +176,8 @@ class AntWorld(Model):
             "max_steps_without_ants": lambda mod: mod.max_steps_without_ants,            
             "reproduction_threshold": lambda mod: mod.reproduction_threshold,
             "pheromone_ant_avg": lambda mod: get_pheromone_avg(mod),
-            "entropy_log": lambda mod: get_entropy(mod)
+            "entropy_log": lambda mod: get_entropy(mod),
+            "state_counts": lambda mod: mod.stopping_condition
         }
 
         self.datacollector = DataCollector(
@@ -187,6 +189,9 @@ class AntWorld(Model):
         """
         Have the scheduler advance each cell by one step
         """
+        self.datacollector.collect(self)
+        
+        self.pheromone_ant_count = 0
 
         self.occupied_cells = []
         self.schedule.step()
@@ -241,8 +246,7 @@ class AntWorld(Model):
         # self.pheromone_ant_count = 0
         # self.pheromone_ant_avg = 0
 
-        self.datacollector.collect(self)
-        self.pheromone_ant_count = 0
+        
 
     def run_model_for_steps(self, n):
         for _ in range(n):
