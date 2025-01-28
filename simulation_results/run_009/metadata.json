@@ -1,0 +1,21 @@
+{
+    "height": 50,
+    "width": 50,
+    "evaporate": 0.25,
+    "diffusion": 0.1,
+    "initdrop": 1000,
+    "lowerbound": 0.01,
+    "prob_random": 0.5,
+    "drop_rate": 0.7,
+    "decay_rate": 0,
+    "max_steps_without_food": 500,
+    "birth_rate": 0.001,
+    "consumption_rate": 0.001,
+    "carrying_capacity": 1,
+    "num_predators": 3,
+    "num_food_locs": 3,
+    "num_ants": 100,
+    "max_steps_without_ants": 100,
+    "reproduction_threshold": 20,
+    "predator_lifetime": 300
+}
