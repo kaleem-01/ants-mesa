@@ -123,7 +123,7 @@ class Food(Agent):
         """
         Returns a bool to show if there is food available
         """
-        return self.amount > 1
+        return self.amount >= 1
     
     def step(self):
         """
