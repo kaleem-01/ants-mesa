@@ -14,7 +14,7 @@ from ants.config import *
 from tqdm import tqdm
 
 # DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying',"Distance", "prob_random", "max_steps_without_food", "birth_rate", "num_predators", "num_food_locs", "num_ants", "max_steps_without_ants", "reproduction_threshold", "predator_lifetime", "pheromone_ant_count"]
-DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying', "Distance",  "num_ants", "pheromone_ant_avg"]
+DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying', "Distance",  "num_ants", "pheromone_ant_avg", "stopping_condition"]
 
 
 
@@ -41,10 +41,10 @@ PROBLEM = {
     'bounds': [
             # [S.FoodParamsRange.EVAPORATE_MIN, S.FoodParamsRange.EVAPORATE_MAX],
             # [S.FoodParamsRange.DIFFUSION_MIN, S.FoodParamsRange.DIFFUSION_MAX],
-            # [S.AntParamsRange.P_PROB_RANDOM_MIN, S.AntParamsRange.P_PROB_RANDOM_MAX],
+            [S.AntParamsRange.P_PROB_RANDOM_MIN, S.AntParamsRange.P_PROB_RANDOM_MAX],
             # [S.AntParamsRange.NUM_ANTS_MIN, S.AntParamsRange.NUM_ANTS_MAX],
             # [S.FoodParamsRange.NUM_FOOD_LOCS_MIN, S.FoodParamsRange.NUM_FOOD_LOCS_MAX],
-            [S.PredatorParamsRange.NUM_PREDATORS_MIN, S.PredatorParamsRange.NUM_PREDATORS_MAX],
+            # [S.PredatorParamsRange.NUM_PREDATORS_MIN, S.PredatorParamsRange.NUM_PREDATORS_MAX],
             # [S.PredatorParamsRange.PREDATOR_LIFETIME_MIN, S.PredatorParamsRange.PREDATOR_LIFETIME_MAX],
             # [S.PredatorParamsRange.MAX_STEPS_WITHOUT_ANTS_MIN, S.PredatorParamsRange.MAX_STEPS_WITHOUT_ANTS_MAX],
             # [S.AntParamsRange.P_BIRTH_MIN, S.AntParamsRange.P_BIRTH_MAX],
@@ -53,9 +53,9 @@ PROBLEM = {
         ]
 }
 
-N_ITERATIONS = 10
+N_ITERATIONS = 100
 N_STEPS = 300
-N_SAMPLES = 25
+N_SAMPLES = 10
 
 DATA = np.zeros((len(PROBLEM['names']), N_SAMPLES * N_ITERATIONS, len(DATA_COLLECTORS) + 1))
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         
         # print(results)
 
-        with open("stopping_condition.csv", "w", newline="") as csvfile:
+        with open("stopping_condition_nobirth.csv", "w", newline="") as csvfile:
             # Get the column names from the first dictionary
             fieldnames = results[0].keys()
             results = [dict(row) for row in results]

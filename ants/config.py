@@ -15,9 +15,10 @@ NUM_PREDATORS = 3
 NUM_FOOD_LOCS = 3
 NUM_ANTS = 100
 MAX_STEPS_WITHOUT_ANTS = 100
-REPRODUCTION_THRESHOLD = 20
+REPRODUCTION_THRESHOLD = 1000
 PREDATOR_LIFETIME = 300
 FOV = 3
+
 
 
 # prob_random=PROB_RANDOM, 
@@ -66,7 +67,7 @@ class AntWorldConfig:
         # self.num_food_locs = kwargs.get('num_food_locs', NUM_FOOD_LOCS)
         # self.num_ants = kwargs.get('num_ants', NUM_ANTS)
         self.max_steps_without_ants = kwargs.get('max_steps_without_ants', MAX_STEPS_WITHOUT_ANTS)
-        self.reproduction_threshold = kwargs.get('reproduction_threshold', REPRODUCTION_THRESHOLD)
+        self.reproduction_threshold = kwargs.get('reproduction_threshold')
         # self.predator_lifetime = kwargs.get('predator_lifetime', PREDATOR_LIFETIME)
         # self.fov = kwargs.get('fov', FOV)
         # self.evaporate = kwargs.get('evaporate', EVAPORATE)

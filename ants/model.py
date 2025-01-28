@@ -151,6 +151,8 @@ class AntWorld(Model):
             return math.sqrt(dx**2 + dy**2)
         
         def get_pheromone_avg(model):
+            if get_ants(model) == 0:
+                return 0
             pherom_avg =  model.pheromone_ant_count / get_ants(model)
             # print(pherom_avg)
             return pherom_avg
@@ -189,8 +191,6 @@ class AntWorld(Model):
         """
         Have the scheduler advance each cell by one step
         """
-        self.datacollector.collect(self)
-        
         self.pheromone_ant_count = 0
 
         self.occupied_cells = []
@@ -229,14 +229,14 @@ class AntWorld(Model):
 
         # Stop simulation if all ants are dead
         if num_ants == 0:
-            self.running = False
             self.stopping_condition = "No ants left"
+            self.running = False
             # print("Stopping: No ants left")
         
         # Stop simulation if all predators are dead
         if self.num_predators > 0 and not any(isinstance(agent, Predator) for agent in self.schedule.agents):
-            self.running = False
             self.stopping_condition = "No predators left"
+            self.running = False
             # print("Stopping: No predators left")
 
         # self.remove_empty_food()
@@ -245,6 +245,8 @@ class AntWorld(Model):
         # print(self.pheromone_ant_avg)
         # self.pheromone_ant_count = 0
         # self.pheromone_ant_avg = 0
+        self.datacollector.collect(self)
+
 
         
 
