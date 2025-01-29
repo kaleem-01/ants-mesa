@@ -200,8 +200,8 @@ class Ant(Agent):
                 self.steps_without_food = 0
                 food.amount -= self.model.carrying_capacity
                 self.carrying += self.model.carrying_capacity
-                self.drop = self.model.initdrop
                 self.state = "HOMING"
+                self.drop = self.model.initdrop
 
             else: # Not on food, move (up gradient or wander)
                 if self.random.random() < self.model.prob_random:
