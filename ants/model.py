@@ -23,9 +23,8 @@ class AntWorld(Model):
         # print("Making World")
         super().__init__()
 
-        height=HEIGHT
-        width=WIDTH
-
+        self.height = kwargs.get('height', HEIGHT)
+        self.width = kwargs.get('width', WIDTH)
         self.prob_random = kwargs.get('prob_random', PROB_RANDOM)
         self.max_steps_without_food = kwargs.get('max_steps_without_food', MAX_STEPS_WITHOUT_FOOD)
         self.max_steps_without_ants = kwargs.get('max_steps_without_ants', MAX_STEPS_WITHOUT_ANTS)
@@ -41,10 +40,10 @@ class AntWorld(Model):
         self.decay_rate = kwargs.get('decay_rate', DECAY_RATE)
         self.consumption_rate = kwargs.get('consumption_rate', CONSUMPTION_RATE)
         self.carrying_capacity = kwargs.get('carrying_capacity', CARRYING_CAPACITY)
-        # self.num_food_locs = kwargs.get('num_food_locs', NUM_FOOD_LOCS)
+        self.num_food_locs = kwargs.get('num_food_locs', NUM_FOOD_LOCS)
         
             
-        self.num_food_locs = NUM_FOOD_LOCS
+        # self.num_food_locs = NUM_FOOD_LOCS
         self.state_counts_over_time = []
         self.predator_lifetime = PREDATOR_LIFETIME
         self.fov = FOV
@@ -62,6 +61,10 @@ class AntWorld(Model):
 
         self.all_predators = []
         self.all_ants = []
+
+        self.dead_predators = 0
+        self.dead_ants = 0
+
         self.pheromone_ant_count = 0
         self.pher_count_list = []
 
@@ -74,7 +77,7 @@ class AntWorld(Model):
         self.schedule = SimultaneousActivation(self)
 
         # Use a simple grid, where edges wrap around.
-        self.grid = MultiGrid(height, width, torus=True)
+        self.grid = MultiGrid(self.height, self.width, torus=True)
 
         # Define pos for the initial home and food locations
         homeloc = (25, 25)
@@ -93,7 +96,7 @@ class AntWorld(Model):
             self.schedule.add(predator)
 
             for _ in range(self.num_predators-1):
-                predator_loc = (random.randint(0, height - 1), random.randint(0, width - 1))
+                predator_loc = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
                 predator = Predator(self.next_id(), self)
                 self.grid.place_agent(predator, predator_loc)
                 self.schedule.add(predator)
@@ -179,7 +182,9 @@ class AntWorld(Model):
             "reproduction_threshold": lambda mod: mod.reproduction_threshold,
             "pheromone_ant_avg": lambda mod: get_pheromone_avg(mod),
             "entropy_log": lambda mod: get_entropy(mod),
-            "state_counts": lambda mod: mod.stopping_condition
+            "state_counts": lambda mod: mod.stopping_condition,
+            "dead_predators": lambda mod: mod.dead_predators,
+            "dead_ants": lambda mod: mod.dead_ants
         }
 
         self.datacollector = DataCollector(
@@ -236,7 +241,7 @@ class AntWorld(Model):
         # Stop simulation if all predators are dead
         if self.num_predators > 0 and not any(isinstance(agent, Predator) for agent in self.schedule.agents):
             self.stopping_condition = "No predators left"
-            self.running = False
+            # self.running = False
             # print("Stopping: No predators left")
 
         # self.remove_empty_food()

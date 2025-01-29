@@ -186,6 +186,7 @@ class Ant(Agent):
 
         self.steps_without_food += 1
         if self.steps_without_food > self.model.max_steps_without_food:
+            self.model.dead_ants += 1
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
             return
@@ -334,6 +335,7 @@ class Predator(Agent):
         """
         self.model.grid.remove_agent(ant)
         self.model.schedule.remove(ant)  # Also remove it from the schedule
+        self.model.dead_ants += 1
         self.ants_eaten += 1
         self.catch_streak += 1
         self.steps_without_ants = 0
@@ -365,9 +367,18 @@ class Predator(Agent):
         """
         self.lifetime -= 1
 
+
         if self.lifetime <= 0 or self.steps_without_ants > self.model.max_steps_without_ants:
+            # There are always atleast some predetors 
+            self.model.dead_predators += 1
+            
+            if self.model.dead_predators == self.model.num_predators:
+                self.reproduce()
+            
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
+
+
             return
         
         if self.random.random() < 0.3:
@@ -379,3 +390,4 @@ class Predator(Agent):
         
         if self.ants_eaten >= self.model.reproduction_threshold:
             self.reproduce()
+            self.model.num_predators +=1
