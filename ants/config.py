@@ -8,13 +8,13 @@ PROB_RANDOM = 0.3
 DROP_RATE = 0.7
 DECAY_RATE = 0
 MAX_STEPS_WITHOUT_FOOD = 100
-BIRTH_RATE = 0.0001
+BIRTH_RATE = 0.01
 CONSUMPTION_RATE = 0.001
 CARRYING_CAPACITY = 1
 NUM_PREDATORS = 3
 NUM_FOOD_LOCS = 3
 NUM_ANTS = 300
-MAX_STEPS_WITHOUT_ANTS = 5
+MAX_STEPS_WITHOUT_ANTS = 80 
 REPRODUCTION_THRESHOLD = 20
 PREDATOR_LIFETIME = 20
 FOV = 3
@@ -72,7 +72,7 @@ class AntWorldConfig:
         # self.fov = kwargs.get('fov', FOV)
         # self.evaporate = kwargs.get('evaporate', EVAPORATE)
         # self.diffusion = kwargs.get('diffusion', DIFFUSION)
-        # self.initdrop = kwargs.get('initdrop', INITDROP)
+        self.initdrop = kwargs.get('initdrop', INITDROP)
         # self.lowerbound = kwargs.get('lowerbound', LOWER
         
 

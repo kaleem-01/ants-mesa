@@ -200,8 +200,8 @@ class Ant(Agent):
                 self.steps_without_food = 0
                 food.amount -= self.model.carrying_capacity
                 self.carrying += self.model.carrying_capacity
-                self.state = "HOMING"
                 self.drop = self.model.initdrop
+                self.state = "HOMING"
 
             else: # Not on food, move (up gradient or wander)
                 if self.random.random() < self.model.prob_random:
@@ -371,6 +371,7 @@ class Predator(Agent):
         if self.lifetime <= 0 or self.steps_without_ants > self.model.max_steps_without_ants:
             # There are always atleast some predetors 
             self.model.dead_predators += 1
+            self.model.num_predators -=     1 
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
 

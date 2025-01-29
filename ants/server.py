@@ -94,7 +94,7 @@ model_params = {
     "drop_rate": Slider("Drop Decay Rate", DROP_RATE, 0, 1, 0.01),
     "decay_rate": Slider("Food Decay Rate", DECAY_RATE, 0.0, 0.1, 0.001),
     "max_steps_without_food": Slider("Max steps without food", MAX_STEPS_WITHOUT_FOOD, 0, 100, 10),
-    "birth_rate": Slider("Birth rate", BIRTH_RATE, 0.0, 0.010, 0.0001),
+    "birth_rate": Slider("Birth rate", BIRTH_RATE, 0.0, 0.2, 0.0001),
     "num_predators": Slider("Number of Predators", NUM_PREDATORS, 0, 30, 1),
     "num_food_locs": Slider("Number of Food Locations", NUM_FOOD_LOCS, 1, 10, 1),
     "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 2000, 10),
@@ -104,17 +104,20 @@ model_params = {
 }
 
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},
-                            {"Label": "Predators", "Color": "red"}])
+                            {"Label": "Predators", "Color": "red"},
+                            {"Label": "ants_eaten", "Color":"black"}])
 
 food_num_plot = ChartModule([{"Label": "Food 🍯", "Color": "blue"},
                              {"Label": "Home 🏠", "Color": "red"},
                              {"Label": "Carrying", "Color": "purple"}])
 
+ants_eaten_plot = ChartModule([{"Label": "Ants eaten", "Color": "red"}])
+
 dist_plot = ChartModule([{"Label": "Distance", "Color": "black"}])
 
 server = ModularServer(
     model_cls = AntWorld, 
-    visualization_elements=[canvas_element, ant_num_plot, food_num_plot, dist_plot], 
+    visualization_elements=[canvas_element, ant_num_plot, food_num_plot, dist_plot, ants_eaten_plot], 
     name="Ants", 
     model_params=model_params
 )

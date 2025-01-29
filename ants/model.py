@@ -58,12 +58,13 @@ class AntWorld(Model):
         self.entropy_log = []
 
 
-        self.min_predators = self.num_predators
+        self.min_predators = 3
         self.all_predators = []
         self.all_ants = []
 
         self.dead_predators = 0
         self.dead_ants = 0
+        self.ants_added = 0
 
         self.pheromone_ant_count = 0
         self.pher_count_list = []
@@ -103,12 +104,17 @@ class AntWorld(Model):
 
         # Add in the ants
         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
-        for i in range(self.num_ants):
-            ant = Ant(self.next_id(), self.home, self)
-            self.grid.place_agent(ant, self.home.pos)
-            self.schedule.add(ant)
+        # for i in range(self.num_ants):
+        #     ant = Ant(self.next_id(), self.home, self)
+        #     self.grid.place_agent(ant, self.home.pos)
+        #     self.schedule.add(ant)
 
-        food_locs = ((40,40), (35,10), (5,33))
+
+
+
+
+
+        food_locs = ((40,40), (27,28), (5,33))
         # Add the food locations
         for each_food_site in food_locs:
             food = Food(self.next_id(), self)
@@ -184,18 +190,29 @@ class AntWorld(Model):
             "entropy_log": lambda mod: get_entropy(mod),
             "state_counts": lambda mod: mod.stopping_condition,
             "dead_predators": lambda mod: mod.dead_predators,
-            "dead_ants": lambda mod: mod.dead_ants
-        }
+            "dead_ants": lambda mod: mod.dead_ants,
+            "ants_eaten": lambda mod: sum(pred.ants_eaten for pred in mod.schedule.agents if isinstance(pred, Predator))
+            # "predators_born": lambda mod : mod.
+            }
 
         self.datacollector = DataCollector(
             model_reporters=model_reporters,
             agent_reporters={}
         )
 
+    def gradual_addition_ants(self):
+        if self.num_ants >= self.ants_added:
+            ant = Ant(self.next_id(), self.home, self)
+            self.grid.place_agent(ant, self.home.pos)
+            self.schedule.add(ant)
+            self.ants_added += 1
+
     def step(self):
         """
         Have the scheduler advance each cell by one step
         """
+        self.gradual_addition_ants()
+
         self.pheromone_ant_count = 0
 
         self.occupied_cells = []
@@ -244,9 +261,11 @@ class AntWorld(Model):
             # self.running = False
             # print("Stopping: No predators left")
 
+        if self.num_predators < self.min_predators:
+            self.sustain_predators()
+            self.num_predators += 1
             
         self.datacollector.collect(self)
-        self.sustain_predators()    
 
 
         # self.remove_empty_food()
@@ -258,15 +277,13 @@ class AntWorld(Model):
 
 
     def sustain_predators(self):
-        if self.stopping_condition == "No predators left":
-            for _ in range(self.min_predators):
-                predator_loc = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
-                predator = Predator(self.next_id(), self)
-                self.grid.place_agent(predator, predator_loc)
-                self.schedule.add(predator)
-                self.num_predators += 1    
+        predator_loc = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+        predator = Predator(self.next_id(), self)
+        self.grid.place_agent(predator, predator_loc)
+        self.schedule.add(predator)
+        # self.num_predators += 1    
 
-        self.stopping_condition = None
+        # self.stopping_condition = None
     
         
 
