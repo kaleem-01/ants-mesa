@@ -7,8 +7,7 @@ from .model import AntWorld
 from .agent import Environment, Ant, Food, Home, Predator
 import math
 
-from .config import HEIGHT, WIDTH, EVAPORATE, DIFFUSION, INITDROP, PROB_RANDOM, DROP_RATE, DECAY_RATE, MAX_STEPS_WITHOUT_FOOD, BIRTH_RATE, NUM_PREDATORS, NUM_FOOD_LOCS, NUM_ANTS, MAX_STEPS_WITHOUT_ANTS, REPRODUCTION_THRESHOLD, PREDATOR_LIFETIME
-
+from .config import *
 
 def log_norm(value, lower, upper):
     """
@@ -100,8 +99,9 @@ model_params = {
     "num_ants": Slider("Number of Ants", NUM_ANTS, 1, 2000, 10),
     "max_steps_without_ants": Slider("Max steps without ants", MAX_STEPS_WITHOUT_ANTS, 0, 100, 10),
     "reproduction_threshold": Slider("Reproduction threshold predators", REPRODUCTION_THRESHOLD, 0, 100, 10),
-    "predator_lifetime": Slider("Predator Lifetime", PREDATOR_LIFETIME, 0, 1000, 10)
-}
+    "predator_lifetime": Slider("Predator Lifetime", PREDATOR_LIFETIME, 0, 1000, 10),
+    "init_ants": Slider("Initial Ants", INIT_ANTS, 1, 100, 1),
+}   
 
 ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},
                             {"Label": "Predators", "Color": "red"},

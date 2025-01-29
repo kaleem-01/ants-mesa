@@ -9,6 +9,7 @@ from .config import *
 import math
 import numpy as np
 
+
 # derived from ConwaysGameOfLife
 class AntWorld(Model):
     """
@@ -41,7 +42,7 @@ class AntWorld(Model):
         self.consumption_rate = kwargs.get('consumption_rate', CONSUMPTION_RATE)
         self.carrying_capacity = kwargs.get('carrying_capacity', CARRYING_CAPACITY)
         self.num_food_locs = kwargs.get('num_food_locs', NUM_FOOD_LOCS)
-        
+        self.init_ants = kwargs.get('init_ants', INIT_ANTS) 
             
         # self.num_food_locs = NUM_FOOD_LOCS
         self.state_counts_over_time = []
@@ -103,18 +104,20 @@ class AntWorld(Model):
                 self.schedule.add(predator)
 
         # Add in the ants
-        # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
+        # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation. These ants are removed 
+        for i in range(self.init_ants):
+            ant = Ant(self.next_id(), self.home, self)
+            self.grid.place_agent(ant, self.home.pos)
+            self.schedule.add(ant)
+
+            # self.schedule.remove(ant)
+
         # for i in range(self.num_ants):
         #     ant = Ant(self.next_id(), self.home, self)
-        #     self.grid.place_agent(ant, self.home.pos)
-        #     self.schedule.add(ant)
+        #     self.grid.remove_agent            
 
+        food_locs = ((40,40), (15, 35), (5,33))
 
-
-
-
-
-        food_locs = ((40,40), (27,28), (5,33))
         # Add the food locations
         for each_food_site in food_locs:
             food = Food(self.next_id(), self)
@@ -201,81 +204,13 @@ class AntWorld(Model):
         )
 
     def gradual_addition_ants(self):
-        if self.num_ants >= self.ants_added:
+        if NUM_ANTS >= self.ants_added:
             ant = Ant(self.next_id(), self.home, self)
             self.grid.place_agent(ant, self.home.pos)
             self.schedule.add(ant)
             self.ants_added += 1
 
-    def step(self):
-        """
-        Have the scheduler advance each cell by one step
-        """
-        self.gradual_addition_ants()
-
-        self.pheromone_ant_count = 0
-
-        self.occupied_cells = []
-        self.schedule.step()
-
-        # Stop if all ants are gone
-        if not any(isinstance(agent, Ant) for agent in self.schedule.agents):
-            self.stopping_condition = "No ants left"
-            self.running = False
-
-
-        # stop when no food remains to collect
-        if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
-            self.stopping_condition = "No food left"
-            self.running = False
-
-        
-        # Record in datacollector
-
-
-        num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
-        for i in range(max(int(self.birth_rate * num_ants), 0)):
-            ant = Ant(self.next_id(), self.home, self)
-            self.grid.place_agent(ant, self.home.pos)
-            self.schedule.add(ant)
-        
-        # self.pheromone_ant_avg = self.pheromone_ant_count / self.num_ants
-        # self.pher_count_list.append(self.pheromone_ant_avg)
-        # print(self.pheromone_ant_avg)
-        
-        unique_occupied_cells, occupied_cells_count = np.unique(self.occupied_cells, axis=0, return_counts=True)
-        occupied_cell_probs = occupied_cells_count.astype(float) / num_ants
-        
-        entropy = float(-np.sum(occupied_cell_probs * np.log(occupied_cell_probs)))
-        self.entropy_log.append(entropy)
-
-        # Stop simulation if all ants are dead
-        if num_ants == 0:
-            self.stopping_condition = "No ants left"
-            self.running = False
-            # print("Stopping: No ants left")
-        
-        # Stop simulation if all predators are dead
-        if self.num_predators > 0 and not any(isinstance(agent, Predator) for agent in self.schedule.agents):
-            self.stopping_condition = "No predators left"
-            # self.running = False
-            # print("Stopping: No predators left")
-
-        if self.num_predators < self.min_predators:
-            self.sustain_predators()
-            self.num_predators += 1
-            
-        self.datacollector.collect(self)
-
-
-        # self.remove_empty_food()
-        # self.make_food()
-
-        # print(self.pheromone_ant_avg)
-        # self.pheromone_ant_count = 0
-        # self.pheromone_ant_avg = 0
-
-
+    
     def sustain_predators(self):
         predator_loc = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
         predator = Predator(self.next_id(), self)
@@ -312,3 +247,72 @@ class AntWorld(Model):
             self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
             self.schedule.add(food)
 
+
+    def step(self):
+            """
+            Have the scheduler advance each cell by one step
+            """
+            self.gradual_addition_ants()
+
+            self.pheromone_ant_count = 0
+
+            self.occupied_cells = []
+            self.schedule.step()
+
+            # Stop if all ants are gone
+            if not any(isinstance(agent, Ant) for agent in self.schedule.agents):
+                self.stopping_condition = "No ants left"
+                self.running = False
+
+
+            # stop when no food remains to collect
+            if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
+                self.stopping_condition = "No food left"
+                self.running = False
+
+            
+            # Record in datacollector
+
+
+            num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
+            for i in range(max(int(self.birth_rate * num_ants), 0)):
+                ant = Ant(self.next_id(), self.home, self)
+                self.grid.place_agent(ant, self.home.pos)
+                self.schedule.add(ant)
+            
+            # self.pheromone_ant_avg = self.pheromone_ant_count / self.num_ants
+            # self.pher_count_list.append(self.pheromone_ant_avg)
+            # print(self.pheromone_ant_avg)
+            
+            unique_occupied_cells, occupied_cells_count = np.unique(self.occupied_cells, axis=0, return_counts=True)
+            occupied_cell_probs = occupied_cells_count.astype(float) / num_ants
+            
+            entropy = float(-np.sum(occupied_cell_probs * np.log(occupied_cell_probs)))
+            self.entropy_log.append(entropy)
+
+            # Stop simulation if all ants are dead
+            if num_ants == 0:
+                self.stopping_condition = "No ants left"
+                self.running = False
+                # print("Stopping: No ants left")
+            
+            # Stop simulation if all predators are dead
+            if self.num_predators > 0 and not any(isinstance(agent, Predator) for agent in self.schedule.agents):
+                self.stopping_condition = "No predators left"
+                # self.running = False
+                # print("Stopping: No predators left")
+
+            if self.num_predators < self.min_predators:
+                self.sustain_predators()
+                self.num_predators += 1
+                
+            self.datacollector.collect(self)
+
+
+            # self.remove_empty_food()
+            # self.make_food()
+
+            # print(self.pheromone_ant_avg)
+            # self.pheromone_ant_count = 0
+
+            # self.pheromone_ant_avg = 0
