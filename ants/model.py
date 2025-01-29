@@ -91,11 +91,11 @@ class AntWorld(Model):
         self.schedule.add(self.home)
 
         if self.num_predators > 0:
-            predator = Predator(self.next_id(), self)
-            self.grid.place_agent(predator, homeloc)
-            self.schedule.add(predator)
+        #     predator = Predator(self.next_id(), self)
+        #     self.grid.place_agent(predator, homeloc)
+        #     self.schedule.add(predator)
 
-            for _ in range(self.num_predators-1):
+            for _ in range(self.num_predators):
                 predator_loc = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
                 predator = Predator(self.next_id(), self)
                 self.grid.place_agent(predator, predator_loc)
@@ -104,15 +104,18 @@ class AntWorld(Model):
         # Add in the ants
         # Need to do this first, or it won't affect the cells, consequence of SimultaneousActivation
         for i in range(self.num_ants):
-            ant = Ant(self.next_id(), self.home, self)
-            self.grid.place_agent(ant, self.home.pos)
+            ant_pos = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+            ant = Ant(self.next_id(), ant_pos, self)
+            #ant = Ant(self.next_id(), self.home, self)
+            #self.grid.place_agent(ant, self.home.pos)
+            self.grid.place_agent(ant, ant_pos)
             self.schedule.add(ant)
 
         food_locs = ((40,40), (35,10), (5,33))
         # Add the food locations
         for each_food_site in food_locs:
             food = Food(self.next_id(), self)
-            food.add(100)
+            food.add(0)
             self.grid.place_agent(food, each_food_site)
             # self.grid.place_agent(food, loc)
             self.schedule.add(food)
@@ -207,20 +210,22 @@ class AntWorld(Model):
             self.running = False
 
 
-        # stop when no food remains to collect
-        if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
-            self.stopping_condition = "No food left"
-            self.running = False
+        # # stop when no food remains to collect
+        # if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
+        #     self.stopping_condition = "No food left"
+        #     self.running = False
 
         
         # Record in datacollector
 
 
         num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
-        for i in range(max(int(self.birth_rate * num_ants), 0)):
-            ant = Ant(self.next_id(), self.home, self)
-            self.grid.place_agent(ant, self.home.pos)
-            self.schedule.add(ant)
+        #for i in range(max(int(self.birth_rate * num_ants), 1)):
+        #ant_pos = self.home
+        ant_pos = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+        ant = Ant(self.next_id(), ant_pos, self)
+        self.grid.place_agent(ant, ant_pos)
+        self.schedule.add(ant)
         
         # self.pheromone_ant_avg = self.pheromone_ant_count / self.num_ants
         # self.pher_count_list.append(self.pheromone_ant_avg)

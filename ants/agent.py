@@ -371,9 +371,10 @@ class Predator(Agent):
         if self.lifetime <= 0 or self.steps_without_ants > self.model.max_steps_without_ants:
             # There are always atleast some predetors 
             self.model.dead_predators += 1
+            self.reproduce()
             
-            if self.model.dead_predators == self.model.num_predators:
-                self.reproduce()
+            # if self.model.dead_predators == self.model.num_predators:
+            #     self.reproduce()
             
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
@@ -381,13 +382,14 @@ class Predator(Agent):
 
             return
         
-        if self.random.random() < 0.3:
-            self.random_move()
-        else:
-            self.gradient_move()
+        # if self.random.random() < 0.3:
+        #     self.random_move()
+        # else:
+        #     self.gradient_move()
 
+        self.gradient_move()
         self.hunt()
         
-        if self.ants_eaten >= self.model.reproduction_threshold:
-            self.reproduce()
-            self.model.num_predators +=1
+        # if self.ants_eaten >= self.model.reproduction_threshold:
+        #     self.reproduce()
+        #     self.model.num_predators +=1
