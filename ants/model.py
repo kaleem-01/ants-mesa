@@ -116,12 +116,13 @@ class AntWorld(Model):
         #     ant = Ant(self.next_id(), self.home, self)
         #     self.grid.remove_agent            
 
-        food_locs = ((40,40), (15, 35), (5,33))
+        # food_locs = ((40,40), (15,20), (5,33))
+        food_locs = ((40,40), (35,10), (5,33))
 
         # Add the food locations
         for each_food_site in food_locs:
             food = Food(self.next_id(), self)
-            food.add(100)
+            food.add(300)
             self.grid.place_agent(food, each_food_site)
             # self.grid.place_agent(food, loc)
             self.schedule.add(food)
@@ -203,12 +204,6 @@ class AntWorld(Model):
             agent_reporters={}
         )
 
-    def gradual_addition_ants(self):
-        if NUM_ANTS >= self.ants_added:
-            ant = Ant(self.next_id(), self.home, self)
-            self.grid.place_agent(ant, self.home.pos)
-            self.schedule.add(ant)
-            self.ants_added += 1
 
     
     def sustain_predators(self):
@@ -240,12 +235,42 @@ class AntWorld(Model):
         """
         Create a new food object
         """
-        food_locs = sum(1 for food in self.schedule.agents if isinstance(food, Food))
+        food_locs = (foo)
         if food_locs < self.num_food_locs:
             food = Food(self.next_id(), self)
             food.add(amount)
             self.grid.place_agent(food, (random.randint(0, self.grid.width - 1), random.randint(0, self.grid.height - 1)))
             self.schedule.add(food)
+
+    def replenish_food(self):
+        """
+        Replenish food at each food site
+        """
+        for food in [food for food in self.schedule.agents if isinstance(food, Food)]:
+            if food.amount < self.carrying_capacity:
+                food.add(100)
+
+    def gradual_addition_ants(self):
+        to_add = self.num_ants - self.init_ants
+        if to_add >= self.ants_added:
+            ant = Ant(self.next_id(), self.home, self)
+            self.grid.place_agent(ant, self.home.pos)
+            self.schedule.add(ant)
+            self.ants_added += 1
+    
+    def replenish_environment(self):
+        environment = [cell for cell in self.schedule.agents if isinstance(cell, Environment)]
+        for cell in environment:
+            self.grid.remove_agent(cell)
+            self.schedule.remove(cell)
+
+        
+        
+        for contents, (x, y) in self.grid.coord_iter():
+            cell = Environment(self.next_id(), (x, y), self)
+            self.grid.place_agent(cell, (x, y))
+            self.schedule.add(cell)
+
 
 
     def step(self):
@@ -253,6 +278,9 @@ class AntWorld(Model):
             Have the scheduler advance each cell by one step
             """
             self.gradual_addition_ants()
+            
+            if self.schedule.steps % 50 == 0:
+                self.replenish_environment()
 
             self.pheromone_ant_count = 0
 
@@ -267,12 +295,10 @@ class AntWorld(Model):
 
             # stop when no food remains to collect
             if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
-                self.stopping_condition = "No food left"
+                self.stopping_condition = "No food left"    
                 self.running = False
 
             
-            # Record in datacollector
-
 
             num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
             for i in range(max(int(self.birth_rate * num_ants), 0)):
@@ -306,6 +332,7 @@ class AntWorld(Model):
                 self.sustain_predators()
                 self.num_predators += 1
                 
+            # Record in datacollector
             self.datacollector.collect(self)
 
 

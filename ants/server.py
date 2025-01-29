@@ -107,8 +107,7 @@ ant_num_plot = ChartModule([{"Label": "Ants 🐜", "Color": "green"},
                             {"Label": "Predators", "Color": "red"},
                             {"Label": "ants_eaten", "Color":"black"}])
 
-food_num_plot = ChartModule([{"Label": "Food 🍯", "Color": "blue"},
-                             {"Label": "Home 🏠", "Color": "red"},
+food_num_plot = ChartModule([{"Label": "Home 🏠", "Color": "red"}, # [{"Label": "Food 🍯", "Color": "blue"},
                              {"Label": "Carrying", "Color": "purple"}])
 
 ants_eaten_plot = ChartModule([{"Label": "Ants eaten", "Color": "red"}])

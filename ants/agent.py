@@ -194,7 +194,7 @@ class Ant(Agent):
         if self.state == "FORAGING":
             # Look for Food
             food = self.get_item(Food,radius=self.model.fov)
-
+            
 
             if food is not None and food.any_food(): # Eat the food and then head home
                 self.steps_without_food = 0
@@ -371,7 +371,6 @@ class Predator(Agent):
         if self.lifetime <= 0 or self.steps_without_ants > self.model.max_steps_without_ants:
             # There are always atleast some predetors 
             self.model.dead_predators += 1
-            self.model.num_predators -=     1 
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
 
