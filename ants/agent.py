@@ -371,10 +371,6 @@ class Predator(Agent):
         if self.lifetime <= 0 or self.steps_without_ants > self.model.max_steps_without_ants:
             # There are always atleast some predetors 
             self.model.dead_predators += 1
-            
-            if self.model.dead_predators == self.model.num_predators:
-                self.reproduce()
-            
             self.model.schedule.remove(self)
             self.model.grid.remove_agent(self)
 

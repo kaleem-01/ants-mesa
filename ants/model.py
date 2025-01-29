@@ -58,7 +58,7 @@ class AntWorld(Model):
         self.entropy_log = []
 
 
-
+        self.min_predators = self.num_predators
         self.all_predators = []
         self.all_ants = []
 
@@ -244,15 +244,30 @@ class AntWorld(Model):
             # self.running = False
             # print("Stopping: No predators left")
 
+            
+        self.datacollector.collect(self)
+        self.sustain_predators()    
+
+
         # self.remove_empty_food()
         # self.make_food()
 
         # print(self.pheromone_ant_avg)
         # self.pheromone_ant_count = 0
         # self.pheromone_ant_avg = 0
-        self.datacollector.collect(self)
 
 
+    def sustain_predators(self):
+        if self.stopping_condition == "No predators left":
+            for _ in range(self.min_predators):
+                predator_loc = (random.randint(0, self.height - 1), random.randint(0, self.width - 1))
+                predator = Predator(self.next_id(), self)
+                self.grid.place_agent(predator, predator_loc)
+                self.schedule.add(predator)
+                self.num_predators += 1    
+
+        self.stopping_condition = None
+    
         
 
     def run_model_for_steps(self, n):
