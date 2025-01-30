@@ -59,7 +59,7 @@ class AntWorld(Model):
         self.entropy_log = []
 
 
-        self.min_predators = 3
+        self.min_predators = MIN_PREDATORS
         self.all_predators = []
         self.all_ants = []
 
@@ -211,9 +211,9 @@ class AntWorld(Model):
         predator = Predator(self.next_id(), self)
         self.grid.place_agent(predator, predator_loc)
         self.schedule.add(predator)
-        # self.num_predators += 1    
+        self.num_predators += 1    
+        self.stopping_condition = None
 
-        # self.stopping_condition = None
     
         
 
@@ -235,7 +235,7 @@ class AntWorld(Model):
         """
         Create a new food object
         """
-        food_locs = (foo)
+        food_locs = sum(1 for food in self.schedule.agents if isinstance(food, Food))
         if food_locs < self.num_food_locs:
             food = Food(self.next_id(), self)
             food.add(amount)
@@ -290,15 +290,13 @@ class AntWorld(Model):
             # Stop if all ants are gone
             if not any(isinstance(agent, Ant) for agent in self.schedule.agents):
                 self.stopping_condition = "No ants left"
-                self.running = False
+                # self.running = False
 
 
-            # stop when no food remains to collect
+            # stop when no food remains to collect (commented out for datacollection)
             if sum(food.amount for food in self.schedule.agents if isinstance(food, Food)) == 0:
                 self.stopping_condition = "No food left"    
-                self.running = False
-
-            
+                # self.running = False       
 
             num_ants = sum(1 for agent in self.schedule.agents if isinstance(agent, Ant))
             for i in range(max(int(self.birth_rate * num_ants), 0)):
@@ -316,17 +314,13 @@ class AntWorld(Model):
             entropy = float(-np.sum(occupied_cell_probs * np.log(occupied_cell_probs)))
             self.entropy_log.append(entropy)
 
-            # Stop simulation if all ants are dead
-            if num_ants == 0:
-                self.stopping_condition = "No ants left"
-                self.running = False
-                # print("Stopping: No ants left")
-            
+
+            self.num_predators = sum(1 for agent in self.schedule.agents if isinstance(agent, Predator))
             # Stop simulation if all predators are dead
             if self.num_predators > 0 and not any(isinstance(agent, Predator) for agent in self.schedule.agents):
                 self.stopping_condition = "No predators left"
                 # self.running = False
-                # print("Stopping: No predators left")
+                print("Stopping: No predators left")
 
             if self.num_predators < self.min_predators:
                 self.sustain_predators()
