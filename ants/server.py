@@ -63,12 +63,18 @@ def diffusion_portrayal(agent):
         portrayal["w"] = 1
         portrayal["h"] = 1
 
-        # Calculate the amount of red we want
-        red = int(log_norm(agent.amount, agent.model.lowerbound, agent.model.initdrop) * 255)
+    #     # # Calculate the amount of red we want
+    #     # red = int(log_norm(agent.amount, agent.model.lowerbound, agent.model.initdrop) * 255)
 
-        # Scale this between red and white
-        # cite https://stackoverflow.com/questions/3380726/converting-a-rgb-color-tuple-to-a-six-digit-code-in-python
-        portrayal["Color"] = '#FF%02x%02x' % (255 - red, 255 - red)
+    #     # # Scale this between red and white
+    #     # # cite https://stackoverflow.com/questions/3380726/converting-a-rgb-color-tuple-to-a-six-digit-code-in-python
+    #     # portrayal["Color"] = '#FF%02x%02x' % (255 - red, 255 - red)
+
+        # Calculate the amount of blue we want
+        blue = int(log_norm(agent.amount, agent.model.lowerbound, agent.model.initdrop) * 255)
+
+        # Scale this between blue and white
+        portrayal["Color"] = '#%02x%02xFF' % (255 - blue, 255 - blue)
     
     elif type(agent) is Predator:
         portrayal["Shape"] = "circle"
