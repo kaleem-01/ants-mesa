@@ -1,22 +1,24 @@
 WIDTH = 50
 HEIGHT = 50
-EVAPORATE = 0.25
+EVAPORATE = 0.1
 DIFFUSION = 0.1
 INITDROP = 1000
 LOWERBOUND = 0.01
 PROB_RANDOM = 0.3
+INIT_ANTS = 20
 DROP_RATE = 0.7
 DECAY_RATE = 0
-MAX_STEPS_WITHOUT_FOOD = 100
-BIRTH_RATE = 0.0001
+MIN_PREDATORS = 3
+MAX_STEPS_WITHOUT_FOOD =200
+BIRTH_RATE = 0.01
 CONSUMPTION_RATE = 0.001
 CARRYING_CAPACITY = 1
 NUM_PREDATORS = 3
 NUM_FOOD_LOCS = 3
-NUM_ANTS = 300
-MAX_STEPS_WITHOUT_ANTS = 5
+NUM_ANTS = 200
+MAX_STEPS_WITHOUT_ANTS = 20 
 REPRODUCTION_THRESHOLD = 20
-PREDATOR_LIFETIME = 20
+PREDATOR_LIFETIME = 50
 FOV = 3
 
 
@@ -34,11 +36,11 @@ class Sensitivity:
 
     class AntParamsRange:
 
-        NUM_ANTS_MIN, NUM_ANTS_MAX = 1, 75 
+        NUM_ANTS_MIN, NUM_ANTS_MAX = 50, 300 
         P_PROB_RANDOM_MIN, P_PROB_RANDOM_MAX = 0, 1
         P_BIRTH_MIN, P_BIRTH_MAX = 0.0, 0.001
-        MAX_STEPS_WITHOUT_FOOD_MIN,MAX_STEPS_WITHOUT_FOOD_MAX = 100, 300
-        
+        MAX_STEPS_WITHOUT_FOOD_MIN,MAX_STEPS_WITHOUT_FOOD_MAX = 60, 120
+        INIT_ANTS_MIN, INIT_ANTS_MAX = 20, 100       
 
     class FoodParamsRange:
         
@@ -52,7 +54,7 @@ class Sensitivity:
         
         NUM_PREDATORS_MIN, NUM_PREDATORS_MAX = 1, 10
         PREDATOR_LIFETIME_MIN, PREDATOR_LIFETIME_MAX = 100, 300
-        MAX_STEPS_WITHOUT_ANTS_MIN, MAX_STEPS_WITHOUT_ANTS_MAX = 100, 300
+        MAX_STEPS_WITHOUT_ANTS_MIN, MAX_STEPS_WITHOUT_ANTS_MAX = 20, 100
         REPRODUCTION_THRESHOLD_MIN, REPRODUCTION_THRESHOLD_MAX = 100, 300
 
 
@@ -72,7 +74,7 @@ class AntWorldConfig:
         # self.fov = kwargs.get('fov', FOV)
         # self.evaporate = kwargs.get('evaporate', EVAPORATE)
         # self.diffusion = kwargs.get('diffusion', DIFFUSION)
-        # self.initdrop = kwargs.get('initdrop', INITDROP)
+        self.initdrop = kwargs.get('initdrop', INITDROP)
         # self.lowerbound = kwargs.get('lowerbound', LOWER
         
 

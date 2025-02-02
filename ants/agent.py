@@ -146,18 +146,11 @@ class Ant(Agent):
         self.moore = moore
         self.steps_without_food = 0
         self.carrying = 0
-
-    # derived from Sugarscape get_sugar()
-    # def get_item(self, item):
-    #     """
-    #     Finds the Agent of type item at this location in the Grid
-    #     """
-    #     this_cell = self.model.grid.get_cell_list_contents([self.pos])
-    #     for agent in this_cell:
-    #         if type(agent) is item:
-    #             return agent
             
     def get_item(self, item, radius=1):
+        """
+        Get the item in the neighborhood of the ant within the radius
+        """
         neighbors = self.model.grid.get_neighbors(self.pos, self.moore, True, radius=radius)
         for neighbor in neighbors:
             if isinstance(neighbor, item):
@@ -194,7 +187,7 @@ class Ant(Agent):
         if self.state == "FORAGING":
             # Look for Food
             food = self.get_item(Food,radius=self.model.fov)
-
+            
 
             if food is not None and food.any_food(): # Eat the food and then head home
                 self.steps_without_food = 0
