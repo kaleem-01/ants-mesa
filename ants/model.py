@@ -215,8 +215,6 @@ class AntWorld(Model):
         self.stopping_condition = None
 
     
-        
-
     def run_model_for_steps(self, n):
         for _ in range(n):
             self.step()
@@ -263,8 +261,6 @@ class AntWorld(Model):
         for cell in environment:
             self.grid.remove_agent(cell)
             self.schedule.remove(cell)
-
-        
         
         for contents, (x, y) in self.grid.coord_iter():
             cell = Environment(self.next_id(), (x, y), self)

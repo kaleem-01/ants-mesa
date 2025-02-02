@@ -117,7 +117,7 @@ def plot_powerlaw(data):
     
 
 
-def main(filename, groupby, column):
+def main(filename, groupby):
     # filename = "max_steps_wo_food_large.csv"
     # groupby = "max_steps_without_food"
     # filename = "prob_random_large.csv"
@@ -129,11 +129,10 @@ def main(filename, groupby, column):
 
     df = load_and_prepare_data(filename)
     df_grouped = df.groupby(groupby)
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(8, 12))
+    fig, (ax1, ax3) = plt.subplots(2, 1, figsize=(8, 12))
     plot_variance_trends(df, ax1, groupby=groupby, column="Ants 🐜", color="red")
-    plot_variance_trends(df, ax2, groupby=groupby, column="dead_ants", color="blue")
+    # plot_variance_trends(df, ax2, groupby=groupby, column="dead_ants", color="blue")
     plot_variance_trends(df, ax3, groupby=groupby, column="Home 🏠", color="green")
-
 
     # ax1.set_xlabel("Probability of Random Move")
     # ax1.set_xlabel("Max Steps Without Food")
@@ -141,7 +140,7 @@ def main(filename, groupby, column):
     ax1.set_title("Variance Trends")
 
     # ax2.set_xlabel("Max Steps Without Food")
-    ax2.set_ylabel(f"Variance in the Number of Dead Ants")
+    # ax2.set_ylabel(f"Variance in the Number of Dead Ants")
 
     ax3.set_ylabel(f"Variance in Food Collected")
     ax3.set_xlabel("Pheromone Evaporation Rate")
@@ -190,7 +189,7 @@ def main(filename, groupby, column):
     # filename_3 = "init_ants_large.csv"
     # file
 
-    print(df.head())
+    # print(df.head())
 
     # plot_variance_trends(df, ax1, groupby=groupby, column="Home 🏠")
 
@@ -198,8 +197,8 @@ def main(filename, groupby, column):
 
     # plot_phase_space(df, ax3)
     # fig.legend()
-    plt.tight_layout()
-    plt.show()
+    # plt.tight_layout()
+    # plt.show()
     
     # plt.savefig(f"plots/mean_std max_steps.png", dpi=600)
 

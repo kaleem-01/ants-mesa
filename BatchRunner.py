@@ -14,7 +14,7 @@ from ants.config import *
 from tqdm import tqdm
 
 # DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying',"Distance", "prob_random", "max_steps_without_food", "birth_rate", "num_predators", "num_food_locs", "num_ants", "max_steps_without_ants", "reproduction_threshold", "predator_lifetime", "pheromone_ant_count"]
-DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying', "Distance",  "num_ants", "pheromone_ant_avg", "stopping_condition"]
+DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying', "Distance",  "num_ants", "pheromone_ant_avg", "stopping_condition", "entropy_log"]
 
 
 
@@ -22,13 +22,10 @@ DATA_COLLECTORS = ["Ants 🐜",'Predators',"Food 🍯","Home 🏠", 'Carrying', 
 
 # PARAMS = ["prob_random", 'max_steps_without_ants', 'birth_rate', 'max_steps_without_food', 'reproduction_threshold']
 PARAMS = ['prob_random']
-# GENERAL_PARAMS = ['DECAY_RATE', 'DROP_RATE']
-# EXPLORE_PARAMS = ['EVAPORATE', 'SPEED_FORAGING']
-# FOOD_PARAMS = ['NUM_FOOD_LOCS', 'CONSUMPTION_RATE', 'CARRYING_CAPACITY',]
-# BIRTH_AND_DEATH_PARAMS = ['BIRTH_RATE', 'PREDATOR_LIFETIME', 'MAX_STEPS_WITHOUT_FOOD', 'MAX_STEPS_WITHOUT_ANTS', 'REPRODUCTION_THRESHOLD']
 
-# INTEGER_PARAMS = ["num_ants"]  
+# INTEGER_PARAMS = ["num_ants"]
 INTEGER_PARAMS = []  
+# INTEGER_PARAMS = ["max_steps_without_ants"]  
 # INTEGER_PARAMS = ["max_steps_without_ants", "max_steps_without_food", "reproduction_threshold"]  
 
 # Data will be stored in this directory
@@ -49,13 +46,15 @@ PROBLEM = {
             # [S.PredatorParamsRange.MAX_STEPS_WITHOUT_ANTS_MIN, S.PredatorParamsRange.MAX_STEPS_WITHOUT_ANTS_MAX],
             # [S.AntParamsRange.P_BIRTH_MIN, S.AntParamsRange.P_BIRTH_MAX],
             # [S.AntParamsRange.MAX_STEPS_WITHOUT_FOOD_MIN, S.AntParamsRange.MAX_STEPS_WITHOUT_FOOD_MAX],
-            # [S.PredatorParamsRange.REPRODUCTION_THRESHOLD_MIN, S.PredatorParamsRange.REPRODUCTION_THRESHOLD_MAX]
+            # [S.PredatorParamsRange.REPRODUCTION_THRESHOLD_MIN, S.PredatorParamsRange.REPRODUCTION_THRESHOLD_MAX],
+            # [S.AntParamsRange.INIT_ANTS_MIN, S.AntParamsRange.INIT_ANTS_MAX]
+            # [0, 0.5]
         ]
 }
 
-N_ITERATIONS = 100
-N_STEPS = 300
-N_SAMPLES = 10
+N_ITERATIONS = 32
+N_STEPS = 500
+N_SAMPLES = 32
 
 DATA = np.zeros((len(PROBLEM['names']), N_SAMPLES * N_ITERATIONS, len(DATA_COLLECTORS) + 1))
 
@@ -73,6 +72,7 @@ if __name__ == '__main__':
         # print(var)
         params = {var: samples}
 
+
         # params = {"prob_random": np.linspace(S.AntParamsRange.P_PROB_RANDOM_MIN, S.AntParamsRange.P_PROB_RANDOM_MAX, N_SAMPLES),
         #             "max_steps_without_food": np.linspace(S.AntParamsRange.MAX_STEPS_WITHOUT_FOOD_MIN, S.AntParamsRange.MAX_STEPS_WITHOUT_FOOD_MAX, N_SAMPLES),
         #             "birth_rate": np.linspace(S.AntParamsRange.P_BIRTH_MIN, S.AntParamsRange.P_BIRTH_MAX, N_SAMPLES),
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         
         # print(results)
 
-        with open("stopping_condition_nobirth.csv", "w", newline="") as csvfile:
+        with open("data/prob_random.csv", "w", newline="") as csvfile:
             # Get the column names from the first dictionary
             fieldnames = results[0].keys()
             results = [dict(row) for row in results]
